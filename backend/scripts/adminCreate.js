@@ -4,7 +4,7 @@ import User from '../models/user.model.js';
 const adminCreate = async() =>{
     try {
 
-        const password = "";
+        const password = "Sainiparshant@123";
         const hashedPassword = await bcrypt.hash(password, 10);
         
         await User.create({

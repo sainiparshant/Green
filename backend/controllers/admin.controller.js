@@ -4,6 +4,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import bcrypt from 'bcrypt'
 import { generateAccessAndRefreshToken } from "./user.controller.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { imagekit } from "../config.js/imageKit.js";
 
 
 
@@ -84,8 +85,76 @@ const adminLogout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "logout successfully", true, {}));
 });
 
+const changePassword = asyncHandler( async(req,res) =>{
+
+    const {oldPassword, newPassword} = req.body;
+    if(!oldPassword || !newPassword) {
+        throw new ApiError(404, "All fields are required!");
+    }
+
+    const user = await User.findById(req.user._id).select("+password");
+    if(!user){
+        throw new ApiError(404, "No user found");
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if(!isMatch){
+        throw new ApiError(401, "Invalid Password");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            "Password Changed successfully",
+            true,
+            {}
+        )
+    );
+
+});
+ 
+const addPhoto = asyncHandler( async (req, res) =>{
+
+    if (!req.file){
+        throw new ApiError(400, "Image is required");
+    }
+        
+    const response = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: Date.now() + ".jpg",
+    });
+
+    const imageUrl = response.url;
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {image: imageUrl},
+        { new: true}
+    );
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "Image uploaded",
+            true,
+            user
+        )
+    );
+      
+});
+
+
 export {
     adminLogin,
     adminLogout,
-    getAdminProfile
+    getAdminProfile,
+    changePassword,
+    addPhoto
 }
