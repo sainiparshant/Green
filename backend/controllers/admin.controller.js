@@ -217,12 +217,50 @@ const updatePlantDetail = asyncHandler( async( req,res) =>{
 
 });
 
+const getSinglePlant = asyncHandler( async (req,res) =>{
+
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400, "Invalid plant id");
+    }
+
+    const plant = await Plant.findById(id);
+    if(!plant){
+        throw new ApiError(404,"No Plant found")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "Plant fetched Successfully",
+            true,
+            plant
+        )
+    );
+
+    
+});
+
+const deletePlant = asyncHandler( async(req,res) =>{
+
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400, "Invalid plant id");
+    }
+
+    
+
+});
+
 export {
     changePassword,
     addPhoto,
     addPlant,
     toggleAvailable,
     toggleFeatured,
-    updatePlantDetail
+    updatePlantDetail,
+    getSinglePlant
 
 }
