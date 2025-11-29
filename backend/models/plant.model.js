@@ -11,6 +11,7 @@ const plantSchema = new mongoose.Schema({
     category:{
         type: String,
         required: true,
+        index: true
     },
     price:{
         type:Number,
@@ -21,17 +22,27 @@ const plantSchema = new mongoose.Schema({
         required: true
     },
     thumbnail:{
-        type:String,
-        required: true,
-    },
-    images:{
-        type: [String],
-        required: true,
-        validate:{
-            validator: arr => arr.length > 0,
-            message: "At least 1 image is required"
+        url:{
+            type: String,
+            required: true,
+        },
+        imageId:{
+            type: String,
+            required: true,
         }
     },
+     images: [
+    {
+      url: {
+        type: String,
+        required: true
+      },
+      imageId: {
+        type: String,
+        required: true
+      }
+    }
+  ],
     stock:{
         type: Number,
         required: true,
@@ -42,7 +53,7 @@ const plantSchema = new mongoose.Schema({
     },
     size:{
         type: String,
-        enum:["small", "medium", "large", "Extra Large"],
+        enum:["small", "medium", "large", "extra_Large"],
         default:"small"
     },
     available:{
@@ -60,7 +71,7 @@ const plantSchema = new mongoose.Schema({
       default: 0,
     },
     isFeatured:{
-        type: String,
+        type: Boolean,
         default: true
     }
 },{timestamps: true});

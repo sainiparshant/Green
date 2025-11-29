@@ -6,6 +6,7 @@ import { ApiError } from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import Plant from "../models/plant.model.js";
 import mongoose from "mongoose";
+import uploadImages from "../services/uploads.service.js";
 
 
 
@@ -54,10 +55,16 @@ const addPhoto = asyncHandler( async (req, res) =>{
     });
 
     const imageUrl = response.url;
+    const imageId = response.fileId;
 
     const user = await User.findByIdAndUpdate(
         req.user._id,
-        {image: imageUrl},
+        {
+            image:{
+                url:imageUrl,
+                imageId
+            }
+        },
         { new: true}
     );
 
@@ -88,9 +95,10 @@ const addPlant = asyncHandler( async(req, res) =>{
 
 
     const uploadResults = await uploadImages(req.files.images);
-    const imageUrls = uploadResults.map((image) => image.url);
-
-    const thumbUrl = imageUrls[0];
+    const images = uploadResults.map(img => ({
+    url: img.url,
+    imageId: img.fileId
+    }));
 
     const plant = await Plant.create({
         name,
@@ -98,8 +106,8 @@ const addPlant = asyncHandler( async(req, res) =>{
         price,
         description,
         stock,
-        thumbnail: thumbUrl,
-        images:imageUrls
+        thumbnail: images[0],
+        images
     });
 
     return res
@@ -245,12 +253,35 @@ const getSinglePlant = asyncHandler( async (req,res) =>{
 
 const deletePlant = asyncHandler( async(req,res) =>{
 
-    const {id} = req.params;
+    const { id } = req.params;
     if(!mongoose.Types.ObjectId.isValid(id)){
         throw new ApiError(400, "Invalid plant id");
     }
-
     
+    const plant = await Plant.findById(id);
+    if(!plant){
+        throw new ApiError(404, "No Plant Found");
+    }
+    
+
+    const deleteOperation = plant.images.map((img) =>
+       imagekit.deleteFile(img.imageId)
+    );
+    
+
+    await Promise.all(deleteOperation);
+
+    await Plant.findByIdAndDelete(id);
+
+    return res.status(200).json(
+    new ApiResponse(
+      200,
+      "Plant  deleted successfully",
+      true,
+      {}
+    )
+  );
+
 
 });
 
@@ -261,6 +292,7 @@ export {
     toggleAvailable,
     toggleFeatured,
     updatePlantDetail,
-    getSinglePlant
+    getSinglePlant,
+    deletePlant
 
 }

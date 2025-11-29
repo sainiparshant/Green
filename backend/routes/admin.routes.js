@@ -1,7 +1,7 @@
 import { Router } from "express";
 import adminAuth from "../middleware/admin.middleware.js";
 import upload from "../middleware/multer.middleware.js";
-import { addPhoto, addPlant, changePassword, getSinglePlant, toggleAvailable, toggleFeatured, updatePlantDetail } from "../controllers/admin.controller.js";
+import { addPhoto, addPlant, changePassword, deletePlant, getSinglePlant, toggleAvailable, toggleFeatured, updatePlantDetail } from "../controllers/admin.controller.js";
 
 
 
@@ -16,6 +16,7 @@ router.patch("/plants/:id/availablity", adminAuth, toggleAvailable);
 router.patch("/plants/:id/feature", adminAuth, toggleFeatured);
 router.patch("/plants/:id/update", adminAuth, updatePlantDetail);
 router.get("/plants/:id", adminAuth, getSinglePlant);
+router.delete("/delete-plant/:id", adminAuth, deletePlant);
 
 
 

@@ -28,8 +28,12 @@ const userSchema = new mongoose.Schema({
         select: false,
     },
     image:{
-        type: String,
-        trim: true
+        url:{
+            type: String,
+        },
+        imageId:{
+            type: String,
+        }
     },
     role:{
         type: String,
