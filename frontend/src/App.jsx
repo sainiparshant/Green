@@ -7,6 +7,7 @@ import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminPlantPage from './pages/admin/AdminPlantPage'
 import AdminLogin from './pages/admin/AdminLogin'
+import AddPlant from './pages/admin/AddPlant'
 
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
       <Route path='/admin' element={<AdminLayout/>}>
           <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
           <Route path='/admin/plants' element={<AdminPlantPage/>}/>
+          <Route path='/admin/plants/add-plant' element={<AddPlant/>}/>
 
       </Route>
 
