@@ -49,7 +49,7 @@ const FeaturedSection = () => {
         <p className='my-4 text-sm md:text-lg '>Discover our handpicked selection of vibrant plants and artisan pots</p>
       </div>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+      <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6'>
         {products.map((product,index) =>(
             <ProductCard key={index} product={product}/>
         ))}

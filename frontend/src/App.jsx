@@ -9,6 +9,7 @@ import AdminPlantPage from './pages/admin/AdminPlantPage'
 import AdminLogin from './pages/admin/AdminLogin'
 import AddPlant from './pages/admin/AddPlant'
 import Contact from './pages/Contact'
+import Plants from './pages/Plants'
 
 
 const App = () => {
@@ -20,6 +21,9 @@ const App = () => {
         <Route path='/' element={<Home/>}/>
         <Route path='/contact' element={<Contact/>}/>
         <Route path='/login' element={<Login/>}/>
+        <Route path='/plants' element={<Plants/>}/>
+
+        
       </Route>
       <Route path='/admin/login' element={<AdminLogin/>}/>
 
