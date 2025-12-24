@@ -7,8 +7,8 @@ const ProductCard = ({ product }) => {
       <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
         <div className="overflow-hidden">
           <motion.img
-            src={product.image}
-            alt={product.title}
+            src={product.thumbnail.url}
+            alt={product.name}
             className="w-full h-full object-cover"
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -18,7 +18,7 @@ const ProductCard = ({ product }) => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-3 p-2 md:p-4">
           <div className="flex-1">
             <h3 className="text-sm md:text-base lg:text-lg font-medium text-gray-900 line-clamp-1">
-              {product.title}
+              {product.name}
             </h3>
             <p className="text-xs md:text-sm text-gray-500">
               {product.category}

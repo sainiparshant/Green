@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.routes.js'
 import cookieParser from "cookie-parser";
 import plantRoutes from "./routes/plant.routes.js"
 import adminRoutes from "./routes/admin.routes.js"
+import adminCreate from "./scripts/adminCreate.js";
 
 
 

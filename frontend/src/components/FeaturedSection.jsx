@@ -1,47 +1,36 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import ProductCard from './ProductCard';
+import API from '../api/axios';
+import { toast } from "react-toastify";
 
-const products = [
-  {
-    title: "Monstera Deliciosa",
-    price: "45",
-    image: "/greenhouse.jpg",
-    category: "Indoor Plants",
-  },
-  {
-    title: "Fiddle Leaf Fig",
-    price: "65",
-    image: "/indoor_plants.jpg",
-    category: "Indoor Plants",
-  },
-  {
-    title: "Snake Plant",
-    price: "35",
-    image: "/outdoor.jpg",
-    category: "Low Maintenance",
-  },
-  {
-    title: "Ceramic Planter Set",
-    price: "55",
-    image: "/plant_pot.jpg",
-    category: "Pots & Planters",
-  },
-  {
-    title: "Terracotta Pots",
-    price: "28",
-    image: "/pots_collection.jpg",
-    category: "Pots & Planters",
-  },
-   {
-    title: "Snake Plant",
-    price: "35",
-    image: "/outdoor.jpg",
-    category: "Low Maintenance",
-  },
-]
 
 
 const FeaturedSection = () => {
+
+   const [plants, setPlants] = useState([]);
+   const [loading, setLoading] = useState(true);
+
+   
+   const AllPlants = async()=>{
+      try {
+        const {data} = await API.get("/plants/all");
+        setPlants(data.data.docs);
+        
+      } catch (error) {
+        toast.error("Server Error");
+        console.log(error);
+        
+      }  
+    }
+
+  useEffect(()=>{
+
+    AllPlants();
+
+  }, []) 
+
+
+
   return (
     <div className='py-10 md:py-15 px-5 md:px-25'>
       <div className='text-center mb-10'>
@@ -50,8 +39,8 @@ const FeaturedSection = () => {
       </div>
 
       <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {products.map((product,index) =>(
-            <ProductCard key={index} product={product}/>
+        {plants.map((plant,index) =>(
+            <ProductCard key={index} product={plant}/>
         ))}
       </div>
       <div className='text-center py-10 md:py-10'>
