@@ -80,21 +80,21 @@ const PlantDetails = () => {
 
           <div className="flex items-center justify-around mt-5">
             <div className="flex flex-col gap-1 items-center">
-              <div className="bg-gray-300 rounded-full p-3">
+              <div className="bg-gray-200 rounded-full p-3">
                 <Sun className="text-emerald-800"/>
               </div>
               <h1 className="font-semibold text-md">Light</h1>
               <p className="p text-sm font-medium">light me</p>
             </div>
             <div className="flex flex-col gap-1 items-center">
-              <div className="bg-gray-300 rounded-full p-3">
+              <div className="bg-gray-200 rounded-full p-3">
                 <Droplet className="text-emerald-800"/>
               </div>
               <h1 className="font-semibold text-md">Water</h1>
               <p className="p text-sm font-medium">Medium</p>
             </div>
             <div className="flex flex-col gap-1 items-center">
-              <div className="bg-gray-300 rounded-full p-3">
+              <div className="bg-gray-200 rounded-full p-3">
                 <TreePalm className="text-emerald-800"/>
               </div>
               <h1 className="font-semibold text-md">Care Level</h1>
@@ -103,6 +103,15 @@ const PlantDetails = () => {
           </div>
 
           <hr className="mt-5 text-gray-300"/>
+
+          <div className="mt-5 flex items-baseline gap-2">
+            <h1 className="text-4xl font-semibold">$450</h1>
+            <p className="p text-sm">Free shipping over 500</p>
+          </div>
+
+          <div className="mt-5">
+            <button className="w-full bg-emerald-900 text-white text-md p-4">Add To Cart</button>
+          </div>
 
         </div>
         
