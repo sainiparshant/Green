@@ -1,90 +1,94 @@
-import React from 'react'
+import React from "react";
 
-const FilterSection = ({filters, setFilters, setPage}) => {
+const FilterSection = ({ filters, setFilters, setPage }) => {
 
+  const handleChange = (field, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    setPage(1);
+  };
 
   return (
     <div className="min-h-screen">
       <div>
-        <h1 className='text-lg font-medium mb-4'>Filters</h1>
-        <hr className='text-gray-400'/>
+        <h1 className="text-lg font-medium mb-4">Filters</h1>
+        <hr className="text-gray-400" />
       </div>
-      <div className='mt-5 font-medium'>
-        <h1 className='text-md font-semibold mb-4'>Category</h1>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id="" className='w-4'/>
-            <label htmlFor="outdoor">Outdoor Plants</label>
-        </div>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id="" className='w-4'/>
-            <label htmlFor="indoor">Indoor Plants</label>
-        </div>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id="" className='w-4'/>
-            <label htmlFor="flower">Flower Plants</label>
-        </div>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id="" className='w-4'/>
-            <label htmlFor="medicinal">Medicinal Plants</label>
-        </div>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id=""  className='w-4'/>
-            <label htmlFor="bonsai">Bonsai Plants</label>
-        </div>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id=""  className='w-4'/>
-            <label htmlFor="herbal">Herbal Plants</label>
-        </div>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id=""  className='w-4'/>
-            <label htmlFor="succulent">Succulent Plants</label>
-        </div>
-      </div>
-      <br />
-      <hr className='text-gray-400'/>
 
-      <div className='mt-5 font-medium'>
-        <h1 className='text-md font-semibold mb-4'>Price Range</h1>
-        <div className='flex flex-col gap-3'>
-            <input type="range" name="" id="price" min={100} max={2000} />
-            <label htmlFor="price">Price</label>
-        </div>
-      </div>
-      <br />
-      <hr className='text-gray-400'/>
+      
+      <div className="mt-5 font-medium">
+        <h1 className="text-md font-semibold mb-4">Category</h1>
 
-      <div className='mt-5 font-medium'>
-        <h1 className='text-md font-semibold mb-4'>Availability</h1>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id="" className='w-4'/>
-            <label htmlFor="instock">In Stock</label>
-        </div>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id="" className='w-4'/>
-            <label htmlFor="outstock">Out of Stock</label>
-        </div>
+        {[
+          "Outdoor",
+          "Indoor",
+          "Flower",
+          "Medicinal",
+          "Bonsai",
+          "Herbal",
+          "Succulent",
+        ].map(cat => (
+          <label key={cat} className="flex gap-3 cursor-pointer">
+            <input
+              type="radio"
+              name="category"
+              className="w-4"
+              value={cat}
+              checked={filters.category === cat}
+              onChange={e => handleChange("category", e.target.value)}
+            />
+            {cat}
+          </label>
+        ))}
       </div>
-      <br />
-      <hr className='text-gray-400'/>
 
-      <div className='mt-5 font-medium'>
-        <h1 className='text-md font-semibold mb-4'>Size</h1>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id="" className='w-4'/>
-            <label htmlFor="small">Small</label>
-        </div>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id="" className='w-4'/>
-            <label htmlFor="medium">Medium</label>
-        </div>
-        <div className='flex gap-3'>
-            <input type="checkbox" name="" id="" className='w-4'/>
-            <label htmlFor="large">Large</label>
+      <br />
+      <hr className="text-gray-400" />
+
+      
+      <div className="mt-5 font-medium">
+        <h1 className="text-md font-semibold mb-4">Price Range</h1>
+
+        <div className="flex flex-col gap-3">
+          <input
+            type="range"
+            id="price"
+            min={100}
+            max={2000}
+            value={filters.price}
+            onChange={e => handleChange("price", Number(e.target.value))}
+          />
+          <label htmlFor="price">Up to ₹{filters.price}</label>
         </div>
       </div>
+
+      <br />
+      <hr className="text-gray-400" />
+
+      
+      <div className="mt-5 font-medium">
+        <h1 className="text-md font-semibold mb-4">Size</h1>
+
+        {["small", "medium", "large"].map(size => (
+          <label key={size} className="flex gap-3 cursor-pointer">
+            <input
+              type="radio"
+              name="size"
+              className="w-4"
+              value={size}
+              checked={filters.size === size}
+              onChange={e => handleChange("size", e.target.value)}
+            />
+            {size}
+          </label>
+        ))}
+      </div>
+
       <br />
     </div>
-  )
-}
+  );
+};
 
-export default FilterSection
+export default FilterSection;

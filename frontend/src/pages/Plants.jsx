@@ -9,7 +9,8 @@ const Plants = () => {
   const [plants, setPlants] = useState([]);
   const [filters, setFilters] = useState({
     category:"",
-    available:true
+    price:2000,
+    size:""
   });
 
   const [page, setPage] = useState(1);

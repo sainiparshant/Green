@@ -14,7 +14,7 @@ const getAllPlants = asyncHandler( async(req,res) =>{
 
     let query= {};
 
-    const { search, available, featured, category } = req.query;
+    const { search, available, featured, category ,size, price} = req.query;
 
     if(search){
        query.$or = [
@@ -30,6 +30,14 @@ const getAllPlants = asyncHandler( async(req,res) =>{
 
     if(category){
         query.category = category;
+    }
+
+    if(size){
+        query.size = size;
+    }
+
+    if(price){
+        query.price = { $lte: Number(price) }
     }
 
     if(featured){
