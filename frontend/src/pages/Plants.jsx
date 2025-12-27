@@ -20,7 +20,7 @@ const Plants = () => {
   const fetchPlants = async () => {
     try {
       const { data } = await API.get(
-        `/plants/all`, {
+        `/products/all/plants`, {
           params: {
             ...filters,
             page,

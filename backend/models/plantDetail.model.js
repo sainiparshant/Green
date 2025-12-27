@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const plantSchema = new mongoose.model({
+const plantSchema = new mongoose.Schema({
     productId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
@@ -36,5 +36,5 @@ const plantSchema = new mongoose.model({
     }
 });
 
-const Plant = mongoose.Model("Plant", plantSchema);
+const Plant = mongoose.model("Plant", plantSchema);
 export default Plant;

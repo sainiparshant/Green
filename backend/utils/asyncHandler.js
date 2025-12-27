@@ -1,10 +1,16 @@
 const asyncHandler = (requestHandler) => async(req,res,next) => {
     try {
         return await requestHandler(req,res,next);
-    } catch (error) {
-        res.status(error.code || 500).json({
+    } catch (err) {
+
+         const statusCode =
+        err.statusCode && err.statusCode >= 400 && err.statusCode < 600
+        ? err.statusCode
+        : 500;
+
+        res.status(statusCode).json({
             success: false,
-            message: error.message
+            message: err.message
         });
     }
 }

@@ -4,10 +4,11 @@ import bcrypt from 'bcrypt'
 import User from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import Plant from "../models/plant.model.js";
 import mongoose from "mongoose";
 import uploadImages from "../services/uploads.service.js";
-import Pot from "../models/pot.model.js";
+import Pot from "../models/potDetail.model.js";
+import Product from "../models/product.model.js";
+import Plant from "../models/PlantDetail.model.js";
 
 
 // admin dashboard
@@ -83,11 +84,19 @@ const addPhoto = asyncHandler( async (req, res) =>{
 });
 
 
-// plant controller
-const addPlant = asyncHandler( async(req, res) =>{
-    const {name, category, price, description, stock, size, title, water, light, carelevel} = req.body;
+// Product Controller
+const addProduct = asyncHandler( async(req, res) =>{
+    const {name, price, description, stock, size, title, productType} = req.body;
 
-    if(!name || !category || !price || !description || !stock || !title || !water || !light || !carelevel ){
+
+    let { details } = req.body;
+
+    if (typeof details === "string") {
+    details = JSON.parse(details);
+    }
+
+
+    if(!name  || !price || !description || !stock || !title || !productType){
         throw new ApiError(400, "All fields are required")
     }
 
@@ -103,9 +112,8 @@ const addPlant = asyncHandler( async(req, res) =>{
     imageId: img.fileId
     }));
 
-    const plant = await Plant.create({
+    const product = await Product.create({
         name,
-        category,
         price,
         description,
         stock,
@@ -113,19 +121,32 @@ const addPlant = asyncHandler( async(req, res) =>{
         images,
         size,
         title,
-        water, 
-        light,
-        carelevel
+        productType,
     });
+
+    if(productType === "Plant"){
+        await Plant.create({
+            productId: product._id,
+            ...details
+        });
+    }
+
+    if(productType === "Pot"){
+        await Pot.create({
+            productId : product._id,
+            ...details
+        });
+    }
+
 
     return res
     .status(200)
     .json(
         new ApiResponse(
             200,
-            "Plant Added successfully",
+            "Product Added successfully",
             true,
-            plant
+            product
         )
     );
 
@@ -730,7 +751,7 @@ const availablePots = asyncHandler( async(req,res) =>{
 export {
     changePassword,
     addPhoto,
-    addPlant,
+    addProduct,
     toggleAvailable,
     toggleFeatured,
     updatePlantDetail,

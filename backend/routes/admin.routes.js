@@ -3,8 +3,8 @@ import adminAuth from "../middleware/admin.middleware.js";
 import upload from "../middleware/multer.middleware.js";
 import {
   addPhoto,
-  addPlant,
   addPot,
+  addProduct,
   availablePlants,
   availablePots,
   changePassword,
@@ -27,10 +27,10 @@ import {
 const router = Router();
 
 router.post(
-  "/add-plant",
+  "/add-product",
   adminAuth,
   upload.fields([{ name: "images", maxCount: 10 }]),
-  addPlant
+  addProduct
 );
 router.patch("/change-password", adminAuth, changePassword);
 router.post("/add-photo", adminAuth, upload.single("image"), addPhoto);

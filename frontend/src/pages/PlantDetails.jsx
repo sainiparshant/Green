@@ -8,24 +8,6 @@ import API from "../api/axios"
 import { useParams } from "react-router-dom";
 import {Loader} from "../components/Loader";
 
-const images = [
-  {
-    id: 1,
-    url: "/indoor_plants.jpg",
-  },
-  {
-    id: 2,
-    url: "/outdoor.jpg",
-  },
-  {
-    id: 3,
-    url: "/plant_pot.jpg",
-  },
-  {
-    id: 4,
-    url: "/indoor_plants.jpg",
-  },
-];
 
 const reviews = [
   {
