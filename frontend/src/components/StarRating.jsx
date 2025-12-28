@@ -7,7 +7,7 @@ const StarRating = ({ rating = 0 }) => {
       {[...Array(5)].map((_, i) => (
         <Star
           key={i}
-          size={20}
+          size={16}
           className={
             i < rating
               ? "text-emerald-800 fill-emerald-800"

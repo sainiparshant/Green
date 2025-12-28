@@ -23,11 +23,11 @@ const AboutSection = () => {
   ]
 
   return (
-    <section className="w-full py-16 px-6 md:px-8">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+    <section className="w-full py-4 md:py-16 px-6 md:px-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-10 items-center">
         
         <div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-medium mb-6 leading-tight">
+          <h1 className="text-xl md:text-4xl lg:text-5xl font-medium mb-2 md:mb-6 leading-tight">
             Growing Together <br className="hidden md:block" /> Since 2003
           </h1>
 
@@ -54,7 +54,7 @@ const AboutSection = () => {
         </div>
 
       </div>
-      <div className="max-w-7xl mx-auto mt-25 grid grid-cols-1 md:grid-cols-3 gap-8 text-center"> 
+      <div className="max-w-7xl mx-auto mt-5 md:mt-25 grid grid-cols-1 md:grid-cols-3 gap-8 text-center"> 
         {AllData.map((data, index) => (
           <AboutSectionCard key={index} data={data}/>
         ))}

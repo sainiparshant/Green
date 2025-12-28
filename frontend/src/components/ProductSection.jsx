@@ -3,7 +3,7 @@ import ProductCard from "./ProductCard";
 import { Loader } from "./Loader";
 import { ArrowBigLeft, Maximize } from "lucide-react";
 
-const PlantSection = ({plants, loading, totalPages, page, setPage}) => {
+const ProductSection = ({products, loading, totalPages, page, setPage}) => {
   
 
   if (loading) {
@@ -15,15 +15,15 @@ const PlantSection = ({plants, loading, totalPages, page, setPage}) => {
   }
 
   return (
-    <div className="py-5 px-5">
+    <div className="py-2 px-2">
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-5">
-        {plants.map((plant) => (
-          <ProductCard key={plant._id} product={plant} />
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 ">
+        {products.map((product) => (
+          <ProductCard key={product._id} product={product} productInfo={product.potDetails.shape}/>
         ))}
       </div>
 
-      <div className="flex justify-center gap-2 mt-20 ">
+      <div className="flex justify-center gap-2 mt-10  md:mt-20">
         {[...Array(totalPages)].map((_, index) => (
           
           <button
@@ -44,4 +44,4 @@ const PlantSection = ({plants, loading, totalPages, page, setPage}) => {
   );
 };
 
-export default PlantSection;
+export default ProductSection;

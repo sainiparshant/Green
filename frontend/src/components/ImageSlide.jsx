@@ -42,7 +42,7 @@ export function ImagesSlide() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <section className="relative h-[70vh] md:h-[75vh] overflow-hidden bg-muted">
+    <section className="relative h-[50vh] md:h-[75vh] overflow-hidden bg-muted">
       {slides.map((slide, index) => (
         <div
           key={index}

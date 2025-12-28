@@ -11,6 +11,8 @@ import AddPlant from './pages/admin/AddPlant'
 import Contact from './pages/Contact'
 import Plants from './pages/Plants'
 import PlantDetails from './pages/PlantDetails'
+import PotDetails from './pages/PotDetails'
+import Pots from './pages/Pots'
 
 
 const App = () => {
@@ -24,6 +26,9 @@ const App = () => {
         <Route path='/login' element={<Login/>}/>
         <Route path='/plants' element={<Plants/>}/>
         <Route path='/plants/:id' element={<PlantDetails/>}/>
+        <Route path='/pots' element={<Pots/>}/>
+        <Route path='/pots/:id' element={<PotDetails/>}/>
+
  
       </Route>
       <Route path='/admin/login' element={<AdminLogin/>}/>

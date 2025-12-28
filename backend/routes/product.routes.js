@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllPlants, getAllPots, getSinglePlant } from '../controllers/products/product.controller.js';
+import { getAllPlants, getAllPots, getSinglePlant, getSinglePot } from '../controllers/products/product.controller.js';
 
 
 
@@ -13,6 +13,7 @@ router.get("/single-plant/:id", getSinglePlant);
 // pots
 
 router.get("/all/pots", getAllPots);
+router.get("/single-pot/:id", getSinglePot);
 
 
 

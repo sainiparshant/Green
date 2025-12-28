@@ -15,7 +15,7 @@ const ProductImagesLayout = ({
             />
           </div>
 
-          <div className="grid grid-cols-4 gap-6 py-4 ">
+          <div className="grid grid-cols-4 gap-2 md:gap-6 py-4 ">
             {images.map((img) => (
               <button
                 key={img._id}

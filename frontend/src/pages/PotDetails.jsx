@@ -43,20 +43,19 @@ const reviews = [
 ];
 
 
-const PlantDetails = () => {
+const PotDetails = () => {
 
-  const [plant, setPlant] = useState({});
+  const [pot, setPot] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState("");
   
 
   const { id } = useParams();
 
-  const fetchPlantDetail = async () => {
+  const fetchPotDetail = async () => {
   try {
-    const { data } = await API.get(`/products/single-plant/${id}`);
-
-    setPlant(data.data[0]);
+    const { data } = await API.get(`/products/single-pot/${id}`);
+    setPot(data.data[0]);
 
   } catch (error) {
     console.log(error.response?.data || error);
@@ -67,15 +66,15 @@ const PlantDetails = () => {
 
 
   useEffect(() =>{
-      fetchPlantDetail();
+      fetchPotDetail();
       
   } ,[])
 
   useEffect(() => {
-    if (plant?.images?.length) {
-      setActiveImage(plant.images[0].url);
+    if (pot?.images?.length) {
+      setActiveImage(pot.images[0].url);
     }
-  }, [plant]);
+  }, [pot]);
 
 
   if (loading) {
@@ -91,7 +90,7 @@ const PlantDetails = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 md:gap-5 p-4 md:p-10">
         <div className="max-w-sm md:max-w-xl">
           <ProductImagesLayout
-            images={plant.images}
+            images={pot.images}
             activeImage={activeImage}
             setActiveImage={setActiveImage}
           />
@@ -99,13 +98,13 @@ const PlantDetails = () => {
 
         <div>
           <div className="flex gap-2">
-            <button className="bg-gray-200 p-1 text-xs rounded">{plant.size}</button>
-            <button className="bg-gray-200 p-1 text-xs rounded">{plant.plantDetails.carelevel}</button>
+            <button className="bg-gray-200 p-1 text-xs rounded">{pot.size}</button>
+            <button className="bg-gray-200 p-1 text-xs rounded">{pot.potDetails.material}</button>
           </div>
 
           <div className="mt-1 md:mt-5 flex flex-col md:gap-2">
-            <h1 className="sm:text-4xl font-semibold text-2xl">{plant.name}</h1>
-            <p className="p italic">{plant.plantDetails.category}</p>
+            <h1 className="sm:text-4xl font-semibold text-2xl">{pot.name}</h1>
+            <p className="p italic">{pot.potDetails.category}</p>
 
             <div className="flex gap-2 items-center mt-1 md:mt-3">
               <StarRating rating={5} />
@@ -114,31 +113,15 @@ const PlantDetails = () => {
 
             <div className="mt-1 md:mt-3">
               <h1 className="text-sm md:text-lg ">
-                {plant.title}
+                {pot.title}
               </h1>
             </div>
           </div>
 
-          <hr className="mt-2 md:mt-5 text-gray-300" />
-
-          <div className="flex items-center justify-around mt-2 md:mt-5">
-            <PlantFeatures icon={<Sun className="w-4 h-4 sm:h-6 sm:w-6"/>} title={"Light"} subtitle={plant.plantDetails.light} />
-            <PlantFeatures
-              icon={<Droplet className="w-4 h-4 sm:h-6 sm:w-6"/>}
-              title={"Water"}
-              subtitle={plant.plantDetails.water}
-            />
-            <PlantFeatures
-              icon={<TreePalm className="w-4 h-4 sm:h-6 sm:w-6"/>}
-              title={"Care Level"}
-              subtitle={plant.plantDetails.carelevel}
-            />
-          </div>
-
-          <hr className="mt-2 md:mt-5 text-gray-300" />
+         
 
           <div className="mt-2 md:mt-5 flex items-baseline gap-2">
-            <h1 className="text-2xl md:text-4xl font-semibold">&#8377; {plant.price}</h1>
+            <h1 className="text-2xl md:text-4xl font-semibold">&#8377; {pot.price}</h1>
             <p className="p text-xs md:text-sm">Free shipping over 500</p>
           </div>
 
@@ -154,9 +137,9 @@ const PlantDetails = () => {
           <div className="max-w-xl md:mt-10 ">
 
             <div className="mt-2 md:mt-5">
-              <h1 className="text-xl font-bold ">About This Plant</h1>
+              <h1 className="text-xl font-bold ">About This {pot.productType}</h1>
               <p className="p italic text-sm sm:text-md mt-1 md:mt-3">
-                {plant.description}
+                {pot.description}
               </p>
             </div>
           </div>
@@ -188,4 +171,4 @@ const PlantDetails = () => {
   );
 };
 
-export default PlantDetails;
+export default PotDetails;

@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from "react";
 import FilterSection from "../components/FilterSection";
-import PlantSection from "../components/ProductSection";
 import { LayoutGrid } from "lucide-react";
 import API from "../api/axios";
+import ProductSection from "../components/ProductSection";
+import PotFilters from "../components/PotFilters";
 
-const Plants = () => {
-  const [plants, setPlants] = useState([]);
+const Pots = () => {
+  const [pots, setPots] = useState([]);
   const [filters, setFilters] = useState({
-    category: "",
+    shape: "",
     price: 2000,
     size: "",
+    material: "",
   });
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  const fetchPlants = async () => {
+  const fetchPots = async () => {
     try {
-      const { data } = await API.get(`/products/all/plants`, {
+      const { data } = await API.get(`/products/all/pots`, {
         params: {
           ...filters,
           page,
@@ -26,7 +28,7 @@ const Plants = () => {
         },
       });
 
-      setPlants(data.data.docs);
+      setPots(data.data.docs);
 
       setTotalPages(data.data.totalPages);
     } catch (error) {
@@ -37,15 +39,15 @@ const Plants = () => {
   };
 
   useEffect(() => {
-    fetchPlants();
+    fetchPots();
   }, [page, filters]);
 
   return (
     <div className="min-h-screen bg-gray-100/30">
       <div className="relative w-full h-[20vh] md:h-[40vh] shadow-2xl">
         <img
-          src="/hero_photo.jpg"
-          alt="Plant Collection"
+          src="/pots_collection.jpg"
+          alt="Pot Collection"
           className="w-full h-full object-cover"
         />
 
@@ -54,12 +56,11 @@ const Plants = () => {
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-6">
             <h1 className="text-xl md:text-6xl font-semibold text-white leading-tight">
-              Our Plant Collection
+              Our Pot Collection
             </h1>
 
             <p className="mt-4 text-xs md:text-lg text-gray-200 max-w-2xl">
-              Discover our carefully curated selection of plants, from easy-care
-              succulents to exotic tropical varieties.
+             Explore our thoughtfully designed plant pots, made to complement your décor while giving your plants a beautiful, cozy home.
             </p>
           </div>
         </div>
@@ -67,7 +68,7 @@ const Plants = () => {
 
       <div className="max-w-7xl mx-auto flex gap-6 md:px-4  md:px-4 py-5">
         <aside className="hidden lg:block w-72 h-200 bg-white rounded-lg border border-gray-200 p-6">
-          <FilterSection
+          <PotFilters
             filters={filters}
             setFilters={setFilters}
             setPage={setPage}
@@ -79,7 +80,7 @@ const Plants = () => {
             <div className="flex items-center gap-2 px-2">
               <LayoutGrid className="w-4 h-4 sm:w-6 sm:h-6" />
               <p className="text-xs md:text-sm font-semibold">
-                {plants.length} Plants
+                {pots.length} Pots
               </p>
             </div>
              
@@ -106,8 +107,8 @@ const Plants = () => {
               </select>
             </div> */}
           </div>
-          <PlantSection
-            products={plants}
+          <ProductSection
+            products={pots}
             totalPages={totalPages}
             loading={loading}
             page={page}
@@ -119,4 +120,4 @@ const Plants = () => {
   );
 };
 
-export default Plants;
+export default Pots;

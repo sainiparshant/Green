@@ -1,5 +1,6 @@
 import React from 'react'
 import { CategoryCard } from './CategoryCard'
+import { Link } from 'react-router-dom'
 
 const categories = [
     {
@@ -13,11 +14,6 @@ const categories = [
         image:"/outdoor.jpg"
     },
     {
-        category: "Succulents",
-        subtitle:"Low maintence beauty",
-        image:"/plant_pot.jpg"
-    },
-    {
         category: "Ceramic Pots",
         subtitle:"HandCrafted Elegance",
         image:"/pots_collection.jpg"
@@ -26,14 +22,16 @@ const categories = [
 
 const CategorySection = () => {
   return (
-    <div className='mx-10 bg-gray-100  rounded-lg px-5 md:px-15'>
-        <div className='text-center pt-5'>
+    <div className='mx-2 md:mx-10 bg-gray-100 rounded-lg px-2 sm:px-5 md:px-15 md:pt-4'>
+        <div className='text-center'>
             <h1 className='md:text-4xl font-medium text-xl'>Shop By Category</h1>
-            <p className='my-4 text-sm md:text-lg'>Find exactly what you're looking for</p>
+            <p className='my-1 md:my-4 text-sm md:text-lg'>Find exactly what you're looking for</p>
       </div>
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4  md:gap-6 pb-5 md:pb-10'>
+      <div className='flex gap-4 overflow-x-scroll md:overflow-x-hidden'>
         {categories.map((category, index) => (
-            <CategoryCard category={category} key={index}/>
+            <Link to={`/plants`} key={index}>
+              <CategoryCard category={category} />
+            </Link>
         ))}
       </div>
     </div>

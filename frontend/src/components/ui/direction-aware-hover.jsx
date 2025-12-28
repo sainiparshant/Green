@@ -67,7 +67,7 @@ export const DirectionAwareHover = ({
           whileHover={direction}
           exit="exit">
              <div className="absolute top-4 left-4 z-30">
-              <span className="px-3 py-1 text-md font-semibold uppercase tracking-wide text-black bg-white backdrop-blur-sm rounded-full">
+              <span className="px-3 py-1 text-sm sm:text-md font-semibold uppercase tracking-wide text-black bg-white backdrop-blur-sm rounded-full">
                 {category}
               </span>
             </div>

@@ -77,16 +77,16 @@ const Navbar = () => {
       </div>
 
       <div className="block lg:hidden ">
-        <div className="flex items-center bg-white border border-gray-300 rounded shadow-sm overflow-hidden">
+        <div className="flex items-center bg-white border border-gray-300 shadow-sm overflow-hidden">
+
+          <button className="p-2 cursor-pointer">
+            <Search className="w-4 h-4" />
+          </button>
           <input
             type="text"
             placeholder="Search plants, pots..."
-            className="w-full px-4 py-2 text-sm outline-none text-gray-700 placeholder-gray-400 rounded-full"
+            className="w-full pl-2 py-2 text-sm outline-none text-gray-700 placeholder-gray-400 rounded-full"
           />
-
-          <button className="bg-emerald-600 hover:bg-emerald-700 transition rounded p-2 mr-2">
-            <Search className="w-8 h-4 text-white" />
-          </button>
         </div>
       </div>
 

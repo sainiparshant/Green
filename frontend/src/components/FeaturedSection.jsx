@@ -18,6 +18,7 @@ const FeaturedSection = () => {
         const {data} = await API.get("/products/all/plants?featured=true&available=true&limit=9");
         setPlants(data.data.docs);
         
+        
       } catch (error) {
         toast.error("Server Error");
         console.log(error);
@@ -43,21 +44,21 @@ const FeaturedSection = () => {
   }
 
   return (
-    <div className='py-10  px-5 md:px-25'>
-      <div className='text-center mb-10'>
-        <h1 className='md:text-4xl font-medium text-2xl'>Featured Collections</h1>
-        <p className='my-4 text-sm md:text-lg '>Discover our handpicked selection of vibrant plants and artisan pots</p>
+    <div className='py-2 px-2 md:py-5 md:px-10 border-1 rounded-lg border-gray-200 m-2 md:m-5'>
+      <div className='text-center mb-2 md:mb-4'>
+        <h1 className='md:text-4xl font-medium text-xl'>Featured Collections</h1>
+        <p className='md:my-2 text-xs md:text-lg '>Discover our handpicked selection of vibrant plants.</p>
       </div>
 
-      <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+      <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
         {plants.map((plant) =>(
-            <ProductCard key={plant._id} product={plant}/>
+            <ProductCard key={plant._id} product={plant} productInfo={plant.plantDetails.category}/>
         ))}
       </div>
-      <div className='text-end'>
+      <div className='text-center my-5'>
         <Link to={"/plants"}>
-        <button className='bg-emerald-800 text-white p-3 rounded-full '>
-            View All
+        <button className='border-1 border-gray-300 shadow-2xl  text-xs p-3 rounded-lg '>
+            View All Plants
       </button>
       </Link>
       </div>

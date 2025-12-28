@@ -98,7 +98,7 @@ const getSinglePlant = asyncHandler( async (req,res) =>{
 
 
     const plant = await Product.aggregate([
-        { $match: id },
+        { $match: {_id : new mongoose.Types.ObjectId(id)} },
         {
             $lookup: {
                 from:"plants",
@@ -221,8 +221,50 @@ const getAllPots = asyncHandler( async(req,res) =>{
     
 });
 
+const getSinglePot = asyncHandler( async (req,res) =>{
+
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400, "Invalid pot id");
+    }
+
+
+    const pot = await Product.aggregate([
+        { $match: {_id : new mongoose.Types.ObjectId(id)} },
+        {
+            $lookup: {
+                from:"pots",
+                localField: "_id",
+                foreignField: "productId",
+                as:"potDetails"
+            }
+        },
+
+        {$unwind : "$potDetails"}
+    ]);
+
+
+    if(!pot){
+        throw new ApiError(404,"No Pot found")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "Pot fetched Successfully",
+            true,
+            pot
+        )
+    );
+
+    
+});
+
 export {
     getAllPlants,
     getSinglePlant,
-    getAllPots
+    getAllPots,
+    getSinglePot
 }

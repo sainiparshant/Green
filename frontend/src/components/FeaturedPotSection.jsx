@@ -43,16 +43,17 @@ const FeaturedPotSection = () => {
   }
 
   return (
-    <div className='py-10 md:py-5 px-5 md:px-25'>
-      <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+    <div className='py-2 px-2 md:px-15 '>
+
+      <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
         {pots.map((pot) =>(
-            <ProductCard key={pot._id} product={pot}/>
+            <ProductCard key={pot._id} product={pot} productInfo={pot.potDetails.shape}/>
         ))}
       </div>
-      <div className='text-end py-10 md:py-10'>
+      <div className='text-center pt-4 md:py-5 mb-2'>
         <Link to={"/pots"}>
-        <button className=' text-white  p-3 rounded-full bg-emerald-800'>
-            View All
+        <button className=' border-1 border-gray-300 shadow-2xl  text-xs p-3 rounded-lg'>
+            View All Pots
       </button>
       </Link>
       </div>
