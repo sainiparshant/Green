@@ -14,12 +14,13 @@ const ProductSection = ({products, loading, totalPages, page, setPage}) => {
     );
   }
 
+  
   return (
     <div className="py-2 px-2">
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 ">
         {products.map((product) => (
-          <ProductCard key={product._id} product={product} productInfo={product.potDetails.shape}/>
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
 

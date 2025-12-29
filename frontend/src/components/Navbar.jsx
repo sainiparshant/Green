@@ -61,7 +61,9 @@ const Navbar = () => {
 
         <div className="flex justify-between gap-6 cursor-pointer">
           <ShoppingCart />
-          <User />
+          <Link to="/login">
+            <User />
+          </Link>
           {isMobileMenuOpen ? (
             <X
               className="lg:hidden cursor-pointer"

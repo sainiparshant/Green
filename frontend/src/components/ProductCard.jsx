@@ -2,7 +2,14 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-const ProductCard = ({ product, productInfo }) => {
+const ProductCard = ({ product }) => {
+
+  let productInfo = "";
+  if (product.productType === "Plant") {
+    productInfo = product.plantDetails.category;
+  } else if (product.productType === "Pot") {
+    productInfo = product.potDetails.shape;
+  }
   return (
     <Link to={`/${product.productType.toLowerCase()}s/${product._id}`}>
       <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white mt-2 md:mt-5">
