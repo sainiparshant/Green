@@ -13,6 +13,7 @@ import Plants from './pages/Plants'
 import PlantDetails from './pages/PlantDetails'
 import PotDetails from './pages/PotDetails'
 import Pots from './pages/Pots'
+import Cart from './pages/Cart'
 
 
 const App = () => {
@@ -31,6 +32,7 @@ const App = () => {
 
  
       </Route>
+      <Route path='/checkout/cart' element={<Cart/>}/>
       <Route path='/admin/login' element={<AdminLogin/>}/>
 
       <Route path='/admin' element={<AdminLayout/>}>
