@@ -10,9 +10,9 @@ const router = Router();
 // user
 router.post("/login", registerUser);
 router.post("/verify-otp", verifyOtp);
-router.get("/profile" , verifyJwt , getUserProfile);
+router.get("/me" , verifyJwt , getUserProfile);
 router.get("/logout",verifyJwt, logoutUser);
-router.get("/refresh-token", regenrateAccessToken);
+router.post("/refresh", regenrateAccessToken);
 
 
 // admin

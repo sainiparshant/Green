@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const auth = useSelector(state => state.auth.isAuth);  
 
   return (
     <div>
@@ -60,8 +63,8 @@ const Navbar = () => {
         </div>
 
         <div className="flex justify-between gap-6 cursor-pointer">
-          <ShoppingCart />
-          <Link to="/login">
+          <Link to={"/checkout/cart"}><ShoppingCart /></Link>
+          <Link to={auth === false ? "/login" : "/account"}>
             <User />
           </Link>
           {isMobileMenuOpen ? (

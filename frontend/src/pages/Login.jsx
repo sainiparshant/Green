@@ -48,13 +48,13 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const { data } = await API.post("/auth/verify-otp", { phone, otp });
-      if (data.success) {
+      const res = await API.post("/auth/verify-otp", { phone, otp });
+      if (res.data.success) {
         toast.success("Login Successfully");
-        dispatch(setUser(data.user));
+        dispatch(setUser(res.data.data));        
         navigate("/");
       } else {
-        toast.error(data.message);
+        toast.error(res.data.message);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Server error");

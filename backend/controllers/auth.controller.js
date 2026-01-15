@@ -148,15 +148,19 @@ const regenrateAccessToken = asyncHandler( async(req,res) => {
     throw new ApiError(401, "Refresh Token not found");
   }
   
-  const decodedToken = await jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
-
-  const user = await User.findById(decodedToken._id).select("refreshToken");
-  if(!user){
-    throw new ApiError(401, "User not found");
+   let decodedToken;
+  try {
+    decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+  } catch {
+    throw new ApiError(401, "Invalid refresh token");
   }
 
-  if(incomingRefreshToken !== user.refreshToken){
-    throw new ApiError(401, "Invalid refresh token");
+  const user = await User.findById(decodedToken._id).select("refreshToken");
+  if(!user || incomingRefreshToken !== user.refreshToken){
+    throw new ApiError(401, "Refresh token mismatch");
   }
 
   const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
@@ -164,6 +168,7 @@ const regenrateAccessToken = asyncHandler( async(req,res) => {
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite:'strict'
   }
 
   return res
@@ -173,9 +178,8 @@ const regenrateAccessToken = asyncHandler( async(req,res) => {
   .json(
     new ApiResponse(
       200,
-      "token generate successfully",
+      "Access token refreshed",
       true,
-      {accessToken}
     )
   )
 

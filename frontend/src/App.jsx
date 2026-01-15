@@ -17,9 +17,25 @@ import Cart from './pages/Cart'
 import Address from './pages/Address'
 import Payment from './pages/Payment'
 import Account from './pages/Account'
+import { useEffect } from 'react'
+import { loadUser } from './redux/authSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import ProtectedRoute from './helper/ProtectedRoute'
 
 
 const App = () => {
+
+  const dispatch = useDispatch();
+  const { loading } = useSelector(state => state.auth);
+
+  useEffect(() => {
+    dispatch(loadUser());
+  }, [dispatch]);
+
+  if (loading) {
+    return null; 
+  }
+
   return (
     <>
     <ToastContainer position="top-right" autoClose={3000}/>
@@ -37,9 +53,9 @@ const App = () => {
 
  
       </Route>
-      <Route path='/checkout/cart' element={<Cart/>}/>
-      <Route path='/checkout/address' element={<Address/>}/>
-      <Route path='/checkout/payment' element={<Payment/>}/>
+      <Route path='/checkout/cart' element={<ProtectedRoute><Cart/></ProtectedRoute>}/>
+      <Route path='/checkout/address' element={<ProtectedRoute><Address/></ProtectedRoute>}/>
+      <Route path='/checkout/payment' element={<ProtectedRoute><Payment/></ProtectedRoute>}/>
 
 
       <Route path='/admin/login' element={<AdminLogin/>}/>
