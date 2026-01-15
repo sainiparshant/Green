@@ -16,6 +16,7 @@ import Pots from './pages/Pots'
 import Cart from './pages/Cart'
 import Address from './pages/Address'
 import Payment from './pages/Payment'
+import Account from './pages/Account'
 
 
 const App = () => {
@@ -31,6 +32,8 @@ const App = () => {
         <Route path='/plants/:id' element={<PlantDetails/>}/>
         <Route path='/pots' element={<Pots/>}/>
         <Route path='/pots/:id' element={<PotDetails/>}/>
+        <Route path='/account' element={<Account/>}/>
+
 
  
       </Route>
