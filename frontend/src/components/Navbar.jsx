@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const cartCount = useSelector(state => state.cart.items.length);
   const auth = useSelector(state => state.auth.isAuth);  
 
   return (
@@ -63,7 +63,15 @@ const Navbar = () => {
         </div>
 
         <div className="flex justify-between gap-6 cursor-pointer">
-          <Link to={"/checkout/cart"}><ShoppingCart /></Link>
+         <Link to="/checkout/cart" className="relative inline-block">
+      <ShoppingCart className="text-gray-800 hover:text-emerald-700 transition" size={26} />
+
+      {cartCount > 0 && (
+        <span className="absolute -top-2 -right-2 bg-emerald-700 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+          {cartCount}
+        </span>
+      )}
+    </Link>
           <Link to={auth === false ? "/login" : "/account"}>
             <User />
           </Link>

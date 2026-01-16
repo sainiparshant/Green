@@ -1,40 +1,27 @@
 import { Trash2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import API from "../api/axios";
 import { useDispatch } from "react-redux";
 import { getCart, removeItem, updateQuantity } from "../redux/cartSlice";
 
 const CartCard = ({ image, name, title, price, quantity, size, productId}) => {
-  const [qty, setQty] = useState(quantity);
   const dispatch = useDispatch();
 
 
   const decrease = async() =>{
-    if(qty <= 1) return;
-    const temp = qty - 1;
-    setQty(temp);
-    await dispatch(updateQuantity({productId, quantity: temp}));
+    if(quantity <= 1) return;
+    await dispatch(updateQuantity({productId, quantity: quantity - 1}));
   }
 
    const increase = async() =>{
-    const temp = qty + 1;
-    setQty(temp);
-    await dispatch(updateQuantity({productId, quantity: temp}));
+    await dispatch(updateQuantity({productId, quantity: quantity + 1}));
   }
 
 
   const handleRemove = async() =>{
    await dispatch(removeItem({productId}));
-   await dispatch(getCart());
   } 
 
-  useEffect(() =>{
-    setQty(quantity);
-  },[quantity]);
-
-
   return (
-    <div className="bg-white flex md:mb-2 p-4 md:p-6 border-b border-gray-300 md:rounded">
+    <div className="bg-white flex md:mb-2 p-4 md:p-6 border-b border-gray-300 rounded-lg">
 
       <div className="flex gap-4 flex-1">
         <img
@@ -75,7 +62,7 @@ const CartCard = ({ image, name, title, price, quantity, size, productId}) => {
           <button 
           onClick={decrease}
           className="px-2 text-sm cursor-pointer">−</button>
-          <span className="px-2 text-sm font-medium">{qty}</span>
+          <span className="px-2 text-sm font-medium">{quantity}</span>
           <button
           onClick={increase}
           className="px-2 text-sm cursor-pointer">+</button>

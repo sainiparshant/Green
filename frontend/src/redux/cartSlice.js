@@ -19,7 +19,7 @@ export const updateQuantity = createAsyncThunk(
         });
         return {
             productId,
-            quantity:res.data.data.items[0].quantity
+            quantity,
         };
     }
 );
@@ -45,6 +45,12 @@ export const addItem = createAsyncThunk(
         return res.data;
     }
 )
+
+export const selectSubTotal = (state) =>
+  state.cart.items.reduce(
+    (sum, item) => sum + item.productId.price * item.quantity,
+    0
+);
 
 const initialState = {
     items:[],
@@ -77,7 +83,7 @@ const cartSlice = createSlice({
             const {productId, quantity} = action.payload;
 
             const item = state.items.find(
-                (i) => i.productId === productId
+                (i) => i.productId._id === productId
             );
 
             if(item){
@@ -87,7 +93,7 @@ const cartSlice = createSlice({
 
         .addCase(removeItem.fulfilled, (state,action) => {
             state.items = state.items.filter(
-                (item) => item.productId !== action.payload
+                (item) => item.productId._id !== action.payload
             );
         })
 

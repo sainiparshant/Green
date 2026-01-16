@@ -1,17 +1,20 @@
-import { Home, ShoppingBag } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import CartCard from "../components/CartCard";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import API from "../api/axios"
+import { useEffect } from "react";
 import { Loader } from "../components/Loader";
 import { useDispatch, useSelector } from "react-redux";
-import { getCart } from "../redux/cartSlice";
+import { getCart, selectSubTotal } from "../redux/cartSlice";
 
 const Cart = () => {
 
   const dispatch = useDispatch();
   const items = useSelector((state) => state.cart.items || []);
   const loading = useSelector((state) => state.cart.loading);
+  const Subtotal = useSelector(selectSubTotal);
+  const shipping = 60;
+  const tax = 0.18 * Subtotal;
+  const totalAmount = Subtotal + shipping + tax;
 
   useEffect(() =>{
     dispatch(getCart());
@@ -21,52 +24,114 @@ const Cart = () => {
       return <div className="flex items-center min-h-screen mx-auto justify-center"><Loader /></div>;
     }
 
-  return (
-    <div className="min-h-screen  mx-auto pb-24">
-      <div
-        className="flex items-center justify-between gap-2 sm:gap-3 px-3 py-4 sm:p-5 border-b border-gray-200">
-        <Link to="/" ><Home className="text-emerald-800" size={22}  /></Link>
-        <h1 className="text-lg sm:text-2xl md:text-3xl font-semibold text-gray-800">
-          Shopping Cart
+ return (
+  <div className="min-h-screen bg-gray-50 pb-24">
+    
+    
+    <div className="flex items-center justify-between gap-2 sm:gap-3 px-4 py-5 bg-white border-b border-gray-200 shadow-sm">
+      <Link to="/">
+        <h1 className="text-emerald-700 hover:text-emerald-900 transition font-bold "  >
+          Home
         </h1>
-        <Link to="/checkout/cart"><ShoppingBag className="text-blue-800" size={22}  /></Link>
-      </div>
+      </Link>
 
-      <div className=" flex flex-col md:flex-row gap-5 md:gap-20 p-0 md:p-10 ">
-       
-        <div className="md:min-w-2xl max-w-lg flex-1">
-          {items.map((item) =>(
-             <CartCard key={item._id} name={item.productId.name} image={item.productId.thumbnail.url} title={item.productId.title} price={item.productId.price}  quantity={item.quantity} size={item.productId.size} productId={item.productId._id}/>
-          ))}
-           
-            
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
+        Shopping Cart
+      </h1>
 
+      <Link to="/checkout/cart">
+        <ShoppingBag className="text-blue-700 hover:text-blue-900 transition" size={24} />
+      </Link>
+    </div>
+
+    <div className="max-w-7xl mx-auto px-3 md:px-8 py-6">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
+
+        
+        <div className="flex-1">
+
+          {items.length === 0 ? (
+            <div className="bg-white rounded-xl shadow-sm p-10 text-center">
+              <p className="text-gray-500 text-lg">
+                Your cart is empty
+              </p>
+              <Link to="/" className="text-emerald-700 mt-3 inline-block">
+                Continue Shopping
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {items.map((item) => (
+                <CartCard
+                  key={item._id}
+                  name={item.productId.name}
+                  image={item.productId.thumbnail.url}
+                  title={item.productId.title}
+                  price={item.productId.price}
+                  quantity={item.quantity}
+                  size={item.productId.size}
+                  productId={item.productId._id}
+                />
+              ))}
+            </div>
+          )}
 
         </div>
-        <div className="md:w-96  bg-white p-4 sm:p-6 lg:p-6 shadow-md md:h-fit md:rounded">
-            <h1 className="font-medium">Order Summary</h1>
-            <div className="flex justify-between mt-4 border-b border-gray-300 pb-4">
-                <div className="flex flex-col gap-2 mt-2">
-                    <p className="p">Subtotal</p>
-                    <p className="p">Shipping</p>
-                    <p className="p">Tax</p>
-                </div>
-                <div className="flex flex-col items-start gap-2 mt-2">
-                    <p className="font-medium">404</p>
-                    <p className="font-medium">40</p>
-                    <p className="font-medium">4</p>
-                </div>
+
+        
+        <div className="lg:w-96">
+          <div className="bg-white rounded-xl shadow-sm p-5 md:p-6 sticky top-6">
+
+            <h2 className="text-lg md:text-xl font-semibold text-gray-800">
+              Order Summary
+            </h2>
+
+            <div className="mt-5 border-b border-gray-200 pb-4 space-y-3">
+
+              <div className="flex justify-between">
+                <span className="text-gray-600">Subtotal</span>
+                <span className="font-medium">₹{Subtotal.toFixed(2)}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-600">Shipping</span>
+                <span className="font-medium">₹{shipping.toFixed(2)}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-600">Tax (18%)</span>
+                <span className="font-medium">₹{tax.toFixed(2)}</span>
+              </div>
+
             </div>
+
             <div className="flex items-center justify-between mt-4">
-                <span className="font-semibold md:text-lg">Total Amount</span>
-                <span className="font-semibold md:text-lg">448</span>
+              <span className="font-semibold text-lg">
+                Total Amount
+              </span>
+              <span className="font-semibold text-lg text-emerald-800">
+                ₹{totalAmount.toFixed(2)}
+              </span>
             </div>
 
-        <button className="w-full bg-emerald-800 p-2 rounded mt-2 md:mt-4 text-white ">Checkout</button>
+            <button
+              className="w-full bg-emerald-700 hover:bg-emerald-800 transition p-3 rounded-lg mt-6 text-white font-medium"
+            >
+              Proceed to Checkout
+            </button>
+
+            <p className="text-xs text-gray-500 text-center mt-3">
+              Taxes included. Shipping calculated at checkout.
+            </p>
+
+          </div>
         </div>
+
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default Cart;

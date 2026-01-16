@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { User, Mail, Phone, Edit2, Save } from "lucide-react";
 
-const Profile = () => {
+const Profile = ({user}) => {
   const [edit, setEdit] = useState(false);
 
   return (
@@ -35,7 +35,8 @@ const Profile = () => {
             <label className="text-sm text-gray-600">Full Name</label>
             <input
               disabled={!edit}
-              defaultValue="Parshant Saini"
+              defaultValue={user.name}
+              placeholder="Username"
               className={`w-full mt-1 px-3 py-2 rounded-lg text-sm outline-none
                 ${edit ? "border bg-white" : "bg-gray-100 border-none"}
               `}
@@ -51,7 +52,8 @@ const Profile = () => {
               />
               <input
                 disabled={!edit}
-                defaultValue="sainiparshant1901@gmail.com"
+                defaultValue={user.email}
+                placeholder="Guest007@gmail.com"
                 className={`w-full mt-1 pl-9 pr-3 py-2 rounded-lg text-sm outline-none
                   ${edit ? "border bg-white" : "bg-gray-100 border-none"}
                 `}
@@ -69,7 +71,7 @@ const Profile = () => {
               />
               <input
                 disabled
-                defaultValue="+91 2040480410"
+                defaultValue={user.phone}
                 className="w-full mt-1 pl-9 pr-3 py-2 rounded-lg text-sm bg-gray-100 outline-none"
               />
             </div>
