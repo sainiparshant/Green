@@ -10,6 +10,7 @@ import productRoutes from "./routes/product.routes.js"
 import cartRoutes from "./routes/cart.routes.js"
 import addressRoutes from "./routes/address.routes.js"
 import orderRoutes from "./routes/order.routes.js"
+import userRoutes from "./routes/user.routes.js"
 
 
 
@@ -35,7 +36,7 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/address', addressRoutes);
 app.use('/api/v1/order', orderRoutes);
-
+app.use('/api/v1/user', userRoutes);
 
 app.listen(port, () =>{
     console.log(`server is listening on port: ${port}`);
