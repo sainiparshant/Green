@@ -39,6 +39,7 @@ app.use('/api/v1/address', addressRoutes);
 app.use('/api/v1/order', orderRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/contact', contactRoutes);
+app.use('/api/v1/payment', paymentRoutes);
 
 app.listen(port, () =>{
     console.log(`server is listening on port: ${port}`);
