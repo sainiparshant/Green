@@ -5,6 +5,6 @@ import { createOrder, verifyPayment } from "../controllers/payment.controller.js
 const router = Router();
 
 router.post("/create-order", verifyJwt, createOrder);
-router.post("/varify-order", verifyJwt, verifyPayment);
+router.post("/verify-order", verifyJwt, verifyPayment);
 
 export default router;

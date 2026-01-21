@@ -48,7 +48,12 @@ const createOrder = asyncHandler( async(req,res) =>{
       200,
       "Razorpay order created",
       true,
-      order
+      {
+        key: process.env.RAZORPAY_API_KEY,
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency
+      }
      )
     );
 
@@ -56,7 +61,7 @@ const createOrder = asyncHandler( async(req,res) =>{
 
 const verifyPayment = asyncHandler( async(req,res) =>{
 
-    const { razorpayPaymentId, razorpayOrderId, razorpaySignature, addressId } = req.body;
+    const { razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
 
     const userId = req.user._id;
 
@@ -64,9 +69,6 @@ const verifyPayment = asyncHandler( async(req,res) =>{
         throw new ApiError(400, "Payment Detail missing")
     }
 
-    if(!mongoose.Types.ObjectId.isValid(addressId)){
-        throw new ApiError(401, "Invalid addressId")
-    }
 
     const body = razorpayOrderId + "|" + razorpayPaymentId;
 
@@ -92,8 +94,8 @@ const verifyPayment = asyncHandler( async(req,res) =>{
         }
 
         const address = await Address.findOne({
-            _id: addressId,
-            user: userId
+            user: userId,
+            isDefault: true,
         })
         .session(session);
 

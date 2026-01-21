@@ -5,6 +5,35 @@ import { priceSummary } from "../redux/cartSlice";
 import { toast } from "react-toastify";
 import API from "../api/axios";
 import { useNavigate} from 'react-router-dom';
+// import loadRazorpay from "../helper/loadRazorPay";
+
+const loadRazorpay = () => {
+  return new Promise((resolve) => {
+    // already loaded
+    if (window.Razorpay) {
+      console.log("Razorpay already available");
+      resolve(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+
+    script.onload = () => {
+      console.log("Razorpay script loaded");
+      resolve(true);
+    };
+
+    script.onerror = () => {
+      console.error("Failed to load Razorpay script");
+      resolve(false);
+    };
+
+    document.body.appendChild(script);
+  });
+};
+
 
 
 const Payment = () => {
@@ -36,8 +65,52 @@ const Payment = () => {
         console.log(error);
       }
     } else {
-      // call online payment API
-      console.log("Online payment");
+      try{
+      const isLoaded = await loadRazorpay();
+      
+      if(!isLoaded){
+        toast.error("RazorPay SDK failed to load");
+        return;
+      }
+
+      const res = await API.post("/payment/create-order");
+
+      const {key, amount, currency, orderId} = res.data.data;
+
+      const options = {
+        key,
+        amount,
+        currency,
+        order_id: orderId,
+        name:"parshant saini",
+        description: "Order Payment",
+         handler: async function (response) {
+        try {
+          
+          await API.post("/payment/verify-order", {
+            razorpayOrderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature,
+          });
+
+          toast.success("Payment successful");
+          navigate("/orders");
+        } catch (error) {
+          toast.error("Payment verification failed");
+        }
+      },
+      theme: {
+        color: "#059669",
+      },
+      }
+
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+      }
+      catch(error){
+         console.log(error);
+         toast.error("Payment failed");
+      }
     }
   };
 
