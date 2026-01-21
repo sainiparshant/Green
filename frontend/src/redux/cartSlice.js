@@ -46,16 +46,26 @@ export const addItem = createAsyncThunk(
     }
 )
 
-export const selectSubTotal = (state) =>
-  state.cart.items.reduce(
-    (sum, item) => sum + item.productId.price * item.quantity,
-    0
+export const priceSummary = createAsyncThunk(
+    "/cart/priceSummary",
+    async() => {
+        const res = await API.get("/cart/price-summary");
+
+        return res.data.data;
+    }
 );
 
 const initialState = {
     items:[],
-    loading: false,
-    error: null
+    cartloading: false,
+    summaryLoading: false,
+    error: null,
+    summary:{
+        subtotal: 0,
+        tax: 0,
+        shipping: 0,
+        totalAmount : 0
+    }
 };
 
 const cartSlice = createSlice({
@@ -67,17 +77,16 @@ const cartSlice = createSlice({
         builder
 
         .addCase(getCart.pending, (state) => {
-            state.loading = true;
+            state.cartloading = true;
         })
         .addCase(getCart.fulfilled, (state, action) =>{
-            state.loading = false,
+            state.cartloading = false,
             state.items = action.payload
         })
         .addCase(getCart.rejected, (state, action) =>{
-            state.loading = false,
+            state.cartloading = false,
             state.error = action.error.message
         })
-
 
         .addCase(updateQuantity.fulfilled, (state,action) => {
             const {productId, quantity} = action.payload;
@@ -99,6 +108,18 @@ const cartSlice = createSlice({
 
         .addCase(addItem.fulfilled, (state,action) =>{
             state.items.push(action.payload);
+        })
+        
+        .addCase(priceSummary.pending, (state) =>{
+            state.summaryLoading = true;
+        })
+        .addCase(priceSummary.fulfilled, (state,action) =>{
+            state.summaryLoading = false,
+            state.summary = action.payload
+        })
+        .addCase(priceSummary.rejected, (state, action) =>{
+            state.summaryLoading = false,
+            state.error = action.error.message
         });
     },
 });

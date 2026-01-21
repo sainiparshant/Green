@@ -1,9 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { CreditCard, Wallet, Truck, ShieldCheck } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { priceSummary } from "../redux/cartSlice";
 
 const Payment = () => {
+
+  const dispatch = useDispatch();
+  const price = useSelector((state) => state.cart.summary);
+
+  useEffect(() =>{
+    dispatch(priceSummary());
+  },[dispatch]);
+
   return (
-    <div className="max-w-6xl mx-auto min-h-screen pb-24">
+    <div className=" min-h-screen pb-24">
 
       <div className="flex items-center justify-between px-4 py-4 sm:px-6 border-b border-gray-200 mb-4">
         <Wallet className="text-emerald-800" size={22} />
@@ -25,7 +35,6 @@ const Payment = () => {
             <input
               type="radio"
               name="payment"
-              defaultChecked
               className="accent-emerald-600"
             />
             <Truck className="text-emerald-600" size={20} />
@@ -41,16 +50,15 @@ const Payment = () => {
             <input
               type="radio"
               name="payment"
-              disabled
               className="accent-emerald-600"
             />
-            <CreditCard className="text-gray-400" size={20} />
+            <CreditCard className="text-emerald-600"  size={20} />
             <div>
-              <p className="font-medium text-gray-400">
+              <p className="font-medium text-gray-900">
                 Online Payment
               </p>
-              <p className="text-sm text-gray-400">
-                Coming soon
+              <p className="text-sm text-gray-500">
+                Pay securely
               </p>
             </div>
           </label>
@@ -65,22 +73,22 @@ const Payment = () => {
 
           <div className="flex justify-between text-sm text-gray-600 mb-2">
             <span>Subtotal</span>
-            <span>₹404</span>
+            <span>₹{price.subtotal}</span>
           </div>
 
           <div className="flex justify-between text-sm text-gray-600 mb-2">
             <span>Shipping</span>
-            <span>₹40</span>
+            <span>₹{price.shipping}</span>
           </div>
 
           <div className="flex justify-between text-sm text-gray-600 mb-4">
             <span>Tax</span>
-            <span>₹4</span>
+            <span>₹{price.tax}</span>
           </div>
 
           <div className="border-t pt-3 flex justify-between font-semibold text-gray-900">
             <span>Total</span>
-            <span>₹448</span>
+            <span>₹{price.totalAmount}</span>
           </div>
 
         </div>

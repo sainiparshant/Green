@@ -4,25 +4,29 @@ import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Loader } from "../components/Loader";
 import { useDispatch, useSelector } from "react-redux";
-import { getCart, selectSubTotal } from "../redux/cartSlice";
+import { getCart, priceSummary } from "../redux/cartSlice";
 
 const Cart = () => {
 
   const dispatch = useDispatch();
   const items = useSelector((state) => state.cart.items || []);
-  const loading = useSelector((state) => state.cart.loading);
-  const Subtotal = useSelector(selectSubTotal);
-  const shipping = 60;
-  const tax = 0.18 * Subtotal;
-  const totalAmount = Math.round((Subtotal + shipping + tax) *100) / 100;
+  const loading = useSelector((state) => state.cart.cartLoading);
+  const price = useSelector((state) => state.cart.summary || {});
 
   useEffect(() =>{
     dispatch(getCart());
   },[dispatch]);
 
+  useEffect(() => {
+  if (items.length > 0) {
+    dispatch(priceSummary());
+  }
+  }, [items, dispatch]);
+
     if(loading){
       return <div className="flex items-center min-h-screen mx-auto justify-center"><Loader /></div>;
     }
+    
 
  return (
   <div className="min-h-screen bg-gray-50 pb-24">
@@ -90,17 +94,17 @@ const Cart = () => {
 
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">₹{Subtotal.toFixed(2)}</span>
+                <span className="font-medium">₹{price.subtotal}</span>
               </div>
 
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
-                <span className="font-medium">₹{shipping.toFixed(2)}</span>
+                <span className="font-medium">₹{price.shipping}</span>
               </div>
 
               <div className="flex justify-between">
                 <span className="text-gray-600">Tax (18%)</span>
-                <span className="font-medium">₹{tax.toFixed(2)}</span>
+                <span className="font-medium">₹{price.tax}</span>
               </div>
 
             </div>
@@ -110,15 +114,16 @@ const Cart = () => {
                 Total Amount
               </span>
               <span className="font-semibold text-lg text-emerald-800">
-                ₹{totalAmount.toFixed(2)}
+                ₹{price.totalAmount}
               </span>
             </div>
-
+            <Link to={"/checkout/address"}>
             <button
               className="w-full bg-emerald-700 hover:bg-emerald-800 transition p-3 rounded-lg mt-6 text-white font-medium"
             >
               Proceed to Checkout
             </button>
+            </Link>
 
             <p className="text-xs text-gray-500 text-center mt-3">
               Taxes included. Shipping calculated at checkout.

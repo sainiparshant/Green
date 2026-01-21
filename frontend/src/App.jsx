@@ -14,7 +14,7 @@ import PlantDetails from './pages/PlantDetails'
 import PotDetails from './pages/PotDetails'
 import Pots from './pages/Pots'
 import Cart from './pages/Cart'
-import Address from './pages/Address'
+import AddressPage from './pages/AddressPage'
 import Payment from './pages/Payment'
 import Account from './pages/Account'
 import { useEffect } from 'react'
@@ -52,11 +52,9 @@ const App = () => {
         <Route path="/search" element={<SearchResult/>}/>
         <Route path='/account' element={<ProtectedRoute><Account/></ProtectedRoute>}/>
 
-
- 
       </Route>
       <Route path='/checkout/cart' element={<ProtectedRoute><Cart/></ProtectedRoute>}/>
-      <Route path='/checkout/address' element={<ProtectedRoute><Address/></ProtectedRoute>}/>
+      <Route path='/checkout/address' element={<ProtectedRoute><AddressPage/></ProtectedRoute>}/>
       <Route path='/checkout/payment' element={<ProtectedRoute><Payment/></ProtectedRoute>}/>
 
 

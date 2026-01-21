@@ -193,6 +193,7 @@ const getCart = asyncHandler( async(req,res) =>{
         })
         .lean();
 
+
     if(!cart){
         throw new ApiError(404, "Cart not Found");
     }
@@ -208,9 +209,49 @@ const getCart = asyncHandler( async(req,res) =>{
     );
 });
 
+const getPriceSummary = asyncHandler( async(req,res) =>{
+
+    const userId = req.user?._id;
+
+    const cart = await Cart.findOne({user: userId})
+    .populate("items.productId")
+    .lean();
+
+    if(!cart || cart.items.length === 0){
+        throw new ApiError(400, "Cart is empty");
+    }
+
+    let subtotal = 0;
+    cart.items.forEach((item) => {
+        subtotal += item.productId.price * item.quantity;
+    });
+
+    const shipping = 60;
+    const tax = 0.18 * subtotal;
+    const totalAmount = Math.round((subtotal + tax+ shipping) * 100)/ 100;
+
+    const result = {
+        shipping,
+        tax,
+        subtotal,
+        totalAmount
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "Price summary fetched",
+            true,
+            result,
+        )
+    )
+});
+
 export {
     addToCart,
     quantityUpdate,
     removeItem,
-    getCart
+    getCart,
+    getPriceSummary
 }
