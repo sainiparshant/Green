@@ -12,6 +12,7 @@ import addressRoutes from "./routes/address.routes.js"
 import orderRoutes from "./routes/order.routes.js"
 import userRoutes from "./routes/user.routes.js"
 import contactRoutes from "./routes/contact.routes.js"
+import paymentRoutes from "./routes/payment.routes.js"
 
 
 

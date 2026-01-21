@@ -1,14 +1,14 @@
 import Razorpay from "razorpay";
-import asyncHandler from "../utils/asyncHandler";
-import  razorpayInstance  from "../config.js/razorpay";
-import Cart from "../models/cart.model";
-import Address from "../models/address.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
+import asyncHandler from "../utils/asyncHandler.js";
+import  razorpayInstance  from "../config.js/razorpay.js";
+import Cart from "../models/cart.model.js";
+import Address from "../models/address.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 import crypto from 'crypto';
-import Order from "../models/order.model";
-import Product from "../models/product.model";
+import Order from "../models/order.model.js";
+import Product from "../models/product.model.js";
 
 const createOrder = asyncHandler( async(req,res) =>{
 

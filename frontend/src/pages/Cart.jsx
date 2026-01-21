@@ -14,7 +14,7 @@ const Cart = () => {
   const Subtotal = useSelector(selectSubTotal);
   const shipping = 60;
   const tax = 0.18 * Subtotal;
-  const totalAmount = Subtotal + shipping + tax;
+  const totalAmount = Math.round((Subtotal + shipping + tax) *100) / 100;
 
   useEffect(() =>{
     dispatch(getCart());
