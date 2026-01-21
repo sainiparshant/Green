@@ -9,14 +9,9 @@ import Product from "../models/product.model.js";
 
 const placeOrder = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
-  const { addressId } = req.body;
-
+ 
   if (!userId) {
     throw new ApiError(401, "Unauthorized Access");
-  }
-
-  if (!addressId || !mongoose.Types.ObjectId.isValid(addressId)) {
-    throw new ApiError(400, "Valid Address Id is required");
   }
 
   const session = await mongoose.startSession();
@@ -33,19 +28,17 @@ const placeOrder = asyncHandler(async (req, res) => {
     }
 
     const address = await Address.findOne({
-      _id: addressId,
       user: userId,
+      isDefault : true,
     }).session(session);
 
    
-    
-
     if (!address) {
       throw new ApiError(404, "Address not found");
     }
 
     let orderItems = [];
-    let totalAmount = 0;
+    let subtotal = 0;
 
     for (const item of cart.items || []) {
       const product = item.productId;
@@ -65,8 +58,14 @@ const placeOrder = asyncHandler(async (req, res) => {
         quantity: item.quantity,
       });
 
-      totalAmount += item.quantity * product.price;
+      subtotal += item.quantity * product.price;
+      
     }
+
+    const tax = 0.18 * subtotal;
+    const shipping = 60;
+
+    const totalAmount = Math.round((subtotal + shipping + tax) * 100) / 100;
 
     const order = await Order.create(
       [
