@@ -8,6 +8,7 @@ import uploadImages from "../services/uploads.service.js";
 import Pot from "../models/potDetail.model.js";
 import Product from "../models/product.model.js";
 import Plant from "../models/PlantDetail.model.js";
+import Order from "../models/order.model.js";
 
 
 // admin dashboard
@@ -151,10 +152,167 @@ const addProduct = asyncHandler( async(req, res) =>{
 
 });
 
+const getProducts = asyncHandler( async(req,res) =>{
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+
+    const {search, available, isFeatured, productType, size} = req.query;
+
+    let query = {};
+    if(search){
+        query.$or = [
+            { name: { $regex: search, $options: "i" } },
+            { title: { $regex: search, $options: "i" }},
+            { description: { $regex: search, $options: "i"}}
+       ]
+    }
+    if(available) query.available = available === "true";
+    if(isFeatured) query.isFeatured  = isFeatured === "true";
+    if(productType) query.productType = productType;
+    if(size) query.size = size;
+
+    const pipeline = [
+        {$match: query},
+        {$sort: {createdAt: -1}}
+    ]
+
+    const options = {
+        page,
+        limit
+    }
+
+    const result = await Product.aggregatePaginate(pipeline, options);
+    
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "All products fetched",
+            true,
+            result
+        )
+    );
+    
+
+
+});
+
+const getOrders = asyncHandler( async( req,res) =>{
+
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 15;
+
+    const { orderStatus, paymentMethod, paymentStatus, search } = req.query;
+    let query = {};
+
+    if(search){
+        query.$or = [
+           { orderNumber: { $regex: search, $options: "i" } },
+           { orderNumber: {$regex : search, $options: "i"}}
+        ]
+    }
+
+    if(orderStatus) query.orderStatus = orderStatus;
+    if(paymentMethod) query.paymentMethod = paymentMethod;
+    if(paymentStatus) query.paymentStatus = paymentStatus;
+
+    const pipeline = [
+        {
+            $lookup: {
+                from:"users",
+                localField: "user",
+                foreignField: "_id",
+                as:"user_detail"
+            }
+        },
+        {$unwind: "$user_detail"},
+        {
+            $project:{
+                _id:1,
+                orderNumber:1,
+                totalAmount:1,
+                orderStatus:1,
+                paymentMethod:1,
+                paymentStatus:1,
+                createdAt: 1,
+                user_detail:{
+                    name:1
+                }
+            }
+        },
+        { $match: query },
+        { $sort: { createdAt: -1}}
+    ]
+
+    const options = {
+        page,
+        limit
+    }
+
+    const result = await Order.aggregatePaginate(pipeline, options);
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "All orders fetched",
+            true,
+            result
+        )
+    )
+});
+
+const getMonthlyRevenue = asyncHandler( async( req,res) =>{
+
+    const year = new Date().getFullYear();
+
+    const data = await Order.aggregate([
+        {
+            $match:{
+                orderStatus: "delivered",
+                paymentStatus: "paid",
+                createdAt:{
+                    $gte: new Date(`${year}-01-01`),
+                    $lte: new Date(`${year+1}-01-01`)
+                }
+            }
+        },
+        {
+            $group:{
+                _id:{
+                    month:{$month: "$createdAt"}
+                },
+                revenue:{$sum: "$totalAmount"}
+            }
+        },
+        {
+            $project:{
+                _id:0,
+                month: "$_id.month",
+                revenue: 1,
+            }
+        },
+        { $sort: {"_id.month": 1}}
+    ]);
+
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "data fetched",
+            true,
+            data
+        )
+    )
+});
+
 
 export {
     changePassword,
     addPhoto,
     addProduct,
+    getProducts,
+    getOrders,
+    getMonthlyRevenue
 
 }

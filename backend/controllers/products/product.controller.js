@@ -41,7 +41,7 @@ const getAllPlants = asyncHandler( async(req,res) =>{
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    const { search, available, featured, category ,size, price} = req.query;
+    const { search, available, category ,size, price} = req.query;
 
     let query= {};
     let productMatch = { productType: "Plant" };
@@ -67,9 +67,6 @@ const getAllPlants = asyncHandler( async(req,res) =>{
         productMatch.price = { $lte: Number(price) }
     }
 
-    if(featured){
-        productMatch.isFeatured = featured === "true";
-    }
 
     if(category){
         query["plantDetails.category"] = {

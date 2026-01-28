@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 const orderSchema = new mongoose.Schema({
     user: {
@@ -67,6 +68,8 @@ const orderSchema = new mongoose.Schema({
       razorpayOrderId: String
     }
 }, {timestamps: true});
+
+orderSchema.plugin(aggregatePaginate);
 
 const Order = mongoose.model("Order", orderSchema);
 export default Order;

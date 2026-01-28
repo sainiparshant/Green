@@ -5,6 +5,9 @@ import {
   addPhoto,
   addProduct,
   changePassword,
+  getMonthlyRevenue,
+  getOrders,
+  getProducts,
 } from "../controllers/admin.controller.js";
 
 const router = Router();
@@ -17,6 +20,10 @@ router.post(
 );
 router.patch("/change-password", adminAuth, changePassword);
 router.post("/add-photo", adminAuth, upload.single("image"), addPhoto);
+router.get("/products", getProducts);
+router.get("/orders", getOrders);
+router.get("/montly-rev", getMonthlyRevenue);
+
 
 
 

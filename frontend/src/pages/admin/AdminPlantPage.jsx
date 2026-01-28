@@ -151,49 +151,59 @@ const AdminPlantPage = () => {
   ];
 
   return (
-    <div className="bg-gray-100 min-h-screen w-full p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold text-gray-800">Plants</h1>
-          <p className="text-sm text-gray-500 mt-2 font-medium">
-          Manage your plant and inventory here.
-          </p>
-        </div>
-        <div>
-          <Link
-          to={"/admin/plants/add-plant"}
-          className="mt-4 bg-emerald-800 text-white
-          rounded-lg px-4 py-3 text-sm outline-none cursor-pointer text-center w-30 md:w-40 font-semibold hover:bg-emerald-600 transition"
-        >
-          Add Plant
-        </Link>
-        </div>
-      </div>
-      <div className="w-full bg-white rounded-xl flex gap-2 p-3 mt-6 border border-gray-300 ">
-        <Search />
+    <div className=" min-h-screen w-full p-2 md:p-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  
+  
+  <div>
+    <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
+      Products
+    </h1>
+    <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-md">
+      Manage your products and inventory here.
+    </p>
+  </div>
+
+  <div className="flex sm:justify-end">
+    <Link
+      to="/admin/plants/add-plant"
+      className="
+        inline-flex items-center justify-center
+        bg-emerald-700 text-white
+        px-4 py-2
+        rounded-md
+        text-sm font-semibold
+        hover:bg-emerald-600
+        transition
+        w-full sm:w-auto
+      "
+    >
+      + Add Product
+    </Link>
+  </div>
+
+</div>
+    <div className="grid grid-col-1 lg:grid-cols-3 items-end gap-10">
+      <div className="w-full lg:col-span-2 bg-white rounded-xl flex  gap-2 py-1 px-3 mt-6 border border-gray-300 ">
+        <Search size={16}/>
         <input
           type="text"
           placeholder="Search here"
-          className="w-full h-full outline-none  text-md"
+          className=" outline-none  text-sm"
         />
       </div>
+      <div class="lg:col-span-1">
+        
+  <select class="w-full bg-white border border-gray-300 text-gray-700 py-1 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-blue-500 appearance-none">
+    <option>Option 1</option>
+    <option>Option 2</option>
+    <option>Option 3</option>
+  </select>
+ 
+</div>
 
-      <div className="flex gap-2">
-        <button
-          type="button"
-          className="mt-4 bg-white border border-gray-300 
-          rounded-lg px-4 py-2 text-sm outline-none cursor-pointer text-center w-40"
-        >
-          Featured
-        </button>
-        <button
-          type="button"
-          className="mt-4 bg-white border border-gray-300 
-          rounded-lg px-4 py-2 text-sm outline-none cursor-pointer text-center w-40"
-        >
-          Available
-        </button>
-      </div>
+    </div>
+
 
       <div className="bg-card rounded-lg border border-border border-gray-300 overflow-hidden mt-6 bg-white">
         <div className="overflow-x-auto">
