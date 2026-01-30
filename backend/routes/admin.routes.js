@@ -6,9 +6,11 @@ import {
   addProduct,
   changePassword,
   dashboardData,
+  deleteProduct,
   getMonthlyRevenue,
   getOrders,
   getProducts,
+  toggleProduct,
 } from "../controllers/admin.controller.js";
 
 const router = Router();
@@ -24,6 +26,8 @@ router.get("/products", getProducts);
 router.get("/orders", getOrders);
 router.get("/monthly-rev", getMonthlyRevenue);
 router.get("/recent-orders", dashboardData);
+router.patch("/toggle/:productId", toggleProduct);
+router.delete("/delete/:productId", deleteProduct);
 
 
 

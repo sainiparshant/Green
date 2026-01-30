@@ -347,9 +347,49 @@ const dashboardData = asyncHandler( async(req,res) =>{
     )
 });
 
+const toggleProduct = asyncHandler( async(req,res) =>{
+    const { productId } = req.params;
+    const { field } = req.body;
+
+    const product = await Product.findById(productId);
+    if(!product){
+        throw new ApiError(404, "No product found");
+    }
+
+    product[field] = !product[field];
+    await product.save();
+
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "Product updated",
+            true,
+            product
+        )
+    )
+});
 
 
+const deleteProduct = asyncHandler( async(req,res) =>{
+    const { productId } = req.params;
 
+    const product = await Product.findByIdAndDelete(productId);
+
+    if(!product){
+        throw new ApiError(404, "Product not found");
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "Product deleted",
+            true,
+            product
+        )
+    )
+});
 
 
 export {
@@ -359,6 +399,8 @@ export {
     getProducts,
     getOrders,
     getMonthlyRevenue,
-    dashboardData
+    dashboardData,
+    toggleProduct,
+    deleteProduct,
 
 }

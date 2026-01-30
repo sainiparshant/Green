@@ -1,56 +1,43 @@
 import { Search, X } from "lucide-react";
-import ProductTable from "../../components/ProductTable";
 import { useState } from "react";
 import API from "../../api/axios";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import OrderTable from "../../components/OrderTable";
 
-const ProductPage = () => {
-  const [products, setProducts] = useState([]);
+const Orders = () => {
+  
+  const [orders, setOrders] = useState([]);
   const [filters, setFilters] = useState({
     search:"",
-    productType:"",
-    available:"",
-    featured:""
+    orderStatus:"",
+    paymentMethod:"",
+    paymentStatus:""
   });
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const allProducts = async () => {
+  const allOrders = async () => {
     try {
-      const {data} = await API.get(
-        `/admin/products`,{
-          params:{
-            ...filters,
-            page
-          }
+      
+      const res = await API.get("/admin/orders",{
+        params:{
+          ...filters,
+          page
         }
-      );
-      setProducts(data.data.docs);
-      setTotalPages(data.data.totalPages);
+      });
+      setOrders(res.data.data.docs);
+      setTotalPages(res.data.data.totalPages);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const deleteProduct = async(id) => {
-
-    setProducts((prev) => prev.filter((p) => p._id !== id));
-    try {
-      await API.delete(`/admin/delete/${id}`);
-      toast.success("product deleted successfully");
-      
-    } catch (error) {
-      console.log(error);
-
-      allProducts();
-      
-    }
-  }
+  
 
   useEffect(() => {
-    allProducts();
+    allOrders();
   }, [filters,page]);
 
   return (
@@ -58,16 +45,12 @@ const ProductPage = () => {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
-            Products
+            Orders
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">
-            Manage your products and inventory here.
+            Manage and track all customer Orders.
           </p>
         </div>
-
-        <button className="bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-emerald-600 transition w-full sm:w-auto">
-          + Add Product
-        </button>
       </div>
 
       <div className="mt-6 flex flex-col lg:flex-row gap-4 overflow-hidden">
@@ -81,7 +64,7 @@ const ProductPage = () => {
       onChange={(e) =>
         setFilters({ ...filters, search: e.target.value })
       }
-      placeholder="Search products..."
+      placeholder="Search Order..."
       className="
         w-full
         pl-9 pr-3 py-2
@@ -97,9 +80,9 @@ const ProductPage = () => {
 
   <div className="relative w-full lg:w-1/3 overflow-hidden">
     <select
-      value={filters.productType}
+      value={filters.orderStatus}
       onChange={(e) =>
-        setFilters({ ...filters, productType: e.target.value })
+        setFilters({ ...filters, orderStatus: e.target.value })
       }
       className="
         w-full
@@ -113,9 +96,36 @@ const ProductPage = () => {
         appearance-none
       "
     >
-      <option value="">All Products</option>
-      <option value="Plant">Plant</option>
-      <option value="Pot">Pot</option>
+      <option value="">All Orders</option>
+      <option value="pending">Pending</option>
+        <option value="shipped">Shipped</option>
+        <option value="cancelled">Cancelled</option>
+        <option value="delivered">Delivered</option>
+
+    </select>
+  </div>
+
+  <div className="relative w-full lg:w-1/3 overflow-hidden">
+    <select
+      value={filters.paymentStatus}
+      onChange={(e) =>
+        setFilters({ ...filters, paymentStatus: e.target.value })
+      }
+      className="
+        w-full
+        py-2 px-3
+        text-sm
+        rounded-lg
+        border border-gray-300
+        bg-white
+        focus:outline-none
+        focus:ring-2 focus:ring-emerald-500
+        appearance-none
+      "
+    >
+      <option value="">Filter By Payment</option>
+      <option value="paid">Paid</option>
+      <option value="pending">Pending</option>
     </select>
   </div>
 </div>
@@ -123,7 +133,7 @@ const ProductPage = () => {
 
       <div className="bg-white rounded-lg border border-gray-300 overflow-hidden mt-6">
         <div className="overflow-x-auto">
-          <ProductTable products={products} onDelete={deleteProduct}/>
+          <OrderTable orders={orders}/>
         </div>
       </div>
 
@@ -180,4 +190,4 @@ const ProductPage = () => {
   );
 };
 
-export default ProductPage;
+export default Orders;

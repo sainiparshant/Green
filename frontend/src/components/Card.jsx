@@ -2,7 +2,7 @@ import React from "react";
 
 const Card = ({ title, icon, quantity }) => {
   return (
-    <div className="bg-white rounded-xl  border border-gray-300 p-3 md:p-4">
+    <div className="bg-white rounded-xl  border border-gray-300 p-3 md:p-4 shadow-md">
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500 font-medium">{title}</p>

@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import ProtectedRoute from './helper/ProtectedRoute'
 import SearchResult from './pages/SearchResult'
 import ProductPage from './pages/admin/ProductPage'
+import Orders from './pages/admin/Orders'
 
 
 const App = () => {
@@ -63,6 +64,7 @@ const App = () => {
       <Route path='/admin' element={<AdminLayout/>}>
           <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
           <Route path='/admin/products' element={<ProductPage/>}/>
+          <Route path='/admin/orders' element={<Orders/>}/>
           <Route path='/admin/products/new' element={<AddPlant/>}/>
 
       </Route>
