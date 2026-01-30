@@ -5,9 +5,8 @@ import Login from './pages/Login'
 import { ToastContainer } from 'react-toastify'
 import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/admin/AdminDashboard'
-import AdminPlantPage from './pages/admin/AdminPlantPage'
 import AdminLogin from './pages/admin/AdminLogin'
-import AddPlant from './pages/admin/AddPlant'
+import AddPlant from './pages/admin/AddProduct'
 import Contact from './pages/Contact'
 import Plants from './pages/Plants'
 import PlantDetails from './pages/PlantDetails'
@@ -22,6 +21,7 @@ import { loadUser } from './redux/authSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import ProtectedRoute from './helper/ProtectedRoute'
 import SearchResult from './pages/SearchResult'
+import ProductPage from './pages/admin/ProductPage'
 
 
 const App = () => {
@@ -62,8 +62,8 @@ const App = () => {
 
       <Route path='/admin' element={<AdminLayout/>}>
           <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
-          <Route path='/admin/product' element={<AdminPlantPage/>}/>
-          <Route path='/admin/plants/add-plant' element={<AddPlant/>}/>
+          <Route path='/admin/products' element={<ProductPage/>}/>
+          <Route path='/admin/products/new' element={<AddPlant/>}/>
 
       </Route>
 

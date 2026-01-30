@@ -22,16 +22,16 @@ const RevenueBarChart = ({ data }) => {
         >
           <CartesianGrid strokeDasharray="3 3" />
 
-          {/* X Axis */}
+          
           <XAxis
-            dataKey="month"
+            dataKey="monthName"
             tick={{ fontSize: 10 }}
             angle={-30}
             textAnchor="end"
             height={45}
           />
 
-          {/* Y Axis */}
+         
           <YAxis
             tick={{ fontSize: 10 }}
             width={45}

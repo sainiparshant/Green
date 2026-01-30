@@ -33,7 +33,7 @@ const potSchema = new mongoose.Schema({
     indoorOutdoor:{
         type : String,
         required: true,
-        enum:["indoor", "outdoor", "both"]
+        enum:["Indoor", "Outdoor", "Both"]
     },
     weight:{
         type: String,

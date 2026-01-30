@@ -1,113 +1,102 @@
-import React from "react";
-import { Edit2, Search, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 const ProductTable = ({ products }) => {
+  const [openMenu, setOpenMenu] = useState(null);
+
   return (
-    <div>
-      <table className="w-full">
-        <thead className="bg-emerald-800 text-white">
-          <tr>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-              Product Name
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-              Category
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-              Price
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-              Stock
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-              Status
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-              Actions
-            </th>
+    <table className="w-full text-sm text-left">
+      <thead className="bg-gray-100 text-gray-600">
+        <tr>
+          <th className="px-4 py-3">Product</th>
+          <th className="px-4 py-3">ProductType</th>
+          <th className="px-4 py-3">Price</th>
+          <th className="px-4 py-3">Stock</th>
+          <th className="px-4 py-3">Size</th>
+          <th className="px-4 py-3 text-center">Available</th>
+          <th className="px-4 py-3 text-center">Featured</th>
+          <th className="px-4 py-3 text-center">Action</th>
+        </tr>
+      </thead>
+
+      <tbody className="divide-y">
+        {products.map((product) => (
+          <tr key={product._id} className="hover:bg-gray-50">
+           
+            <td className="px-4 py-3 font-medium text-gray-900">
+              {product.name}
+            </td>
+
+            
+            <td className="px-4 py-3 text-gray-600">
+              {product.productType}
+            </td>
+
+            
+            <td className="px-4 py-3">₹{product.price}</td>
+
+           
+            <td className="px-4 py-3">
+              {product.stock > 0 ? product.stock : "Out of stock"}
+            </td>
+
+            <td className="px-4 py-3">{product.size}</td>
+
+            
+            <td className="px-4 py-3 text-center">
+              <Toggle checked={product.available} />
+            </td>
+
+            
+            <td className="px-4 py-3 text-center">
+              <Toggle checked={product.featured} />
+            </td>
+
+            
+            <td className="px-4 py-3 text-center relative">
+              <button
+                onClick={() =>
+                  setOpenMenu(openMenu === product._id ? null : product._id)
+                  
+                }
+                className="p-1 rounded hover:bg-gray-200"
+              >
+                <MoreVertical size={16} />
+              </button>
+
+              {openMenu === product._id && (
+                <div className="absolute right-4 top-10 w-28 bg-white border rounded-md shadow-md z-10">
+                  <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100">
+                    <Pencil size={14} /> Edit
+                  </button>
+                  <button className="flex items-center gap-2 w-full px-3 py-2 text-red-600 hover:bg-gray-100">
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              )}
+            </td>
           </tr>
-        </thead>
-        <tbody className="divide-y divide-border divide-gray-300">
-          {products.length > 0 ? (
-            products.map((product) => (
-              <tr
-                key={product.id}
-                className="hover:bg-gray-100 transition cursor-pointer"
-              >
-                <td className="px-6 py-4 text-sm font-medium text-foreground">
-                  {product.name}
-                </td>
-                <td className="px-6 py-4 text-sm text-foreground">
-                  {product.category}
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-foreground">
-                  ${product.price}
-                </td>
-                <td className="px-6 py-4 text-sm text-foreground">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      product.stock > 15
-                        ? "bg-emerald-100 text-emerald-700"
-                        : product.stock > 0
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {product.stock} units
-                  </span>
-                </td>
+        ))}
+      </tbody>
+    </table>
+  );
+};
 
-                <td className="px-6 py-4 text-sm text-gray-800">
-                  <div className="flex items-center gap-3">
-                   
-                    <span
-                      className="inline-flex items-center gap-2 px-2.5 py-1 rounded border text-xs font-medium 
-      border-gray-200 bg-white text-gray-700"
-                    >
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          product.available ? "bg-gray-800" : "bg-gray-300"
-                        }`}
-                      ></span>
-                      {product.available ? "Available" : "Unavailable"}
-                    </span>
-
-                    
-                    <span
-                      className="inline-flex items-center gap-2 px-2.5 py-1 rounded border text-xs font-medium 
-      border-gray-200 bg-white text-gray-600"
-                    >
-                      {product.featured ? "Featured" : "Standard"}
-                    </span>
-                  </div>
-                </td>
-
-                <td className="px-6 py-4 text-sm">
-                  <div className="flex gap-2">
-                    <button className="p-2 hover:bg-secondary rounded-lg transition text-emerald-600 hover:text-emerald-700">
-                      <Edit2 size={16} />
-                    </button>
-                    <button className="p-2 hover:bg-secondary rounded-lg transition text-red-600 hover:text-red-700">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan={6}
-                className="px-6 py-8 text-center text-muted-foreground"
-              >
-                No products found matching your filters.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+const Toggle = ({ checked }) => {
+  return (
+    <div
+      className={`w-10 h-5 flex items-center rounded-full p-1 cursor-pointer ${
+        checked ? "bg-emerald-600" : "bg-gray-300"
+      }`}
+    >
+      <div
+        className={`bg-white w-4 h-4 rounded-full shadow transform duration-300 ${
+          checked ? "translate-x-5" : ""
+        }`}
+      />
     </div>
   );
 };
+
 
 export default ProductTable;

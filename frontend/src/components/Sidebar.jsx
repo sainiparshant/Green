@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 const Sidebar = () => {
   const menuItems = [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/product", label: "Products", icon: Package },
+    { href: "/admin/products", label: "Products", icon: Package },
     { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ];

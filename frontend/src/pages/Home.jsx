@@ -11,7 +11,6 @@ const Home = () => {
       <ImagesSlide/>
       <FeaturedSection/>
       <FeaturedPotSection/>
-      <CategorySection/>
       <AboutSection/>
     </main>
   )

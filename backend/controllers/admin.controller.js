@@ -164,7 +164,8 @@ const getProducts = asyncHandler( async(req,res) =>{
         query.$or = [
             { name: { $regex: search, $options: "i" } },
             { title: { $regex: search, $options: "i" }},
-            { description: { $regex: search, $options: "i"}}
+            { description: { $regex: search, $options: "i"}},
+            {size: { $regex: search, $options: "i"}}
        ]
     }
     if(available) query.available = available === "true";
@@ -292,7 +293,7 @@ const getMonthlyRevenue = asyncHandler( async( req,res) =>{
                 revenue: 1,
             }
         },
-        { $sort: {"_id.month": 1}}
+        { $sort: {"month": 1}}
     ]);
 
     return res.status(200)
@@ -306,6 +307,50 @@ const getMonthlyRevenue = asyncHandler( async( req,res) =>{
     )
 });
 
+const dashboardData = asyncHandler( async(req,res) =>{
+
+    const stats = await Order.aggregate([
+        {
+            $match:{
+                paymentStatus:"paid",
+                orderStatus: "delivered"
+            }
+        },
+        {
+            $group:{
+                _id:null ,
+                total:{ $sum: "$totalAmount"},
+                count: {$sum: 1}
+        }
+        }
+
+    ]);
+
+    let stat = stats[0] || { total: 0, count: 0};
+
+    const recentOrders = await Order.find()
+    .sort({ createdAt: -1})
+    .select("orderNumber createdAt totalAmount orderStatus")
+    .limit(10);
+
+    const totalProduct = await Product.countDocuments();
+    const totalCustomer = await User.countDocuments();
+
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "data fetched",
+            true,
+            {stat ,recentOrders, totalProduct, totalCustomer}
+        )
+    )
+});
+
+
+
+
+
 
 export {
     changePassword,
@@ -313,6 +358,7 @@ export {
     addProduct,
     getProducts,
     getOrders,
-    getMonthlyRevenue
+    getMonthlyRevenue,
+    dashboardData
 
 }
