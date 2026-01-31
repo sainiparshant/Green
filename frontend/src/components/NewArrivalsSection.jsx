@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import ProductCard from './ProductCard';
-import API from '../api/axios';
+import React, { useEffect, useState } from "react";
+import ProductCard from "./ProductCard";
+import API from "../api/axios";
 import { toast } from "react-toastify";
-import { Loader } from './Loader';
-import { Link } from 'react-router-dom';
-import { Sparkles, TrendingUp } from 'lucide-react';
+import { Loader } from "./Loader";
+import { Link } from "react-router-dom";
+import { Sparkles, TrendingUp } from "lucide-react";
 
 const NewArrivalsSection = () => {
   const [products, setProducts] = useState([]);
@@ -13,7 +13,9 @@ const NewArrivalsSection = () => {
   const fetchNewArrivals = async () => {
     try {
       // Fetch recently added products (you can sort by createdAt on backend)
-      const { data } = await API.get("/products/all/plants?available=true&limit=8&sort=-createdAt");
+      const { data } = await API.get(
+        "/products/all/plants?available=true&limit=8&sort=-createdAt",
+      );
       setProducts(data.data.docs);
     } catch (error) {
       toast.error("Server Error");
@@ -76,7 +78,7 @@ const NewArrivalsSection = () => {
         {/* View All Button */}
         <div className="text-center mt-8">
           <Link to="/plants">
-            <button className="border-2 border-emerald-600 text-emerald-600 px-8 py-3 rounded-lg font-semibold hover:bg-emerald-600 hover:text-white transition-colors">
+            <button className="border-2 border-emerald-600 text-emerald-600 px-8 py-2 rounded-lg font-semibold hover:bg-emerald-600 hover:text-white transition-colors">
               View All New Arrivals
             </button>
           </Link>
