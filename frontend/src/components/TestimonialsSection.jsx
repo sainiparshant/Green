@@ -121,7 +121,7 @@ const TestimonialsSection = () => {
           {[...testimonials, ...testimonials].map((testimonial, index) => (
             <div 
               key={`${testimonial.id}-${index}`}
-              className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300 relative flex-shrink-0 w-[320px] md:w-[380px]"
+              className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300 relative shrink-0 w-[320px] md:w-[380px]"
             >
               {/* Quote Icon */}
               <div className="absolute top-4 right-4 text-emerald-100">
