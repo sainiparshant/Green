@@ -9,22 +9,63 @@ const Navbar = () => {
   const cartCount = useSelector(state => state.cart.items.length);
   const auth = useSelector(state => state.auth.isAuth);  
   const [query, setQuery] = useState("");
+  const [placeholder, setPlaceholder] = useState("");
+  const [categoryIndex, setCategoryIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleSearch = () => {
-  if (!query || query.trim() === "") return;
+  const categories = [
+    "Search for outdoor plants...",
+    "Search for indoor plants...",
+    "Search for flowers...",
+    "Search for pots..."
+  ];
 
-  navigate(`/search?query=${query}`);
-};
+  // Typewriter effect
+  useEffect(() => {
+    const typingSpeed = isDeleting ? 50 : 100;
+    const pauseTime = 2000; // Pause at end of word
+
+    const timer = setTimeout(() => {
+      const currentCategory = categories[categoryIndex];
+
+      if (!isDeleting && charIndex < currentCategory.length) {
+        // Typing
+        setPlaceholder(currentCategory.substring(0, charIndex + 1));
+        setCharIndex(charIndex + 1);
+      } else if (isDeleting && charIndex > 0) {
+        // Deleting
+        setPlaceholder(currentCategory.substring(0, charIndex - 1));
+        setCharIndex(charIndex - 1);
+      } else if (!isDeleting && charIndex === currentCategory.length) {
+        // Finished typing, pause then start deleting
+        setTimeout(() => setIsDeleting(true), pauseTime);
+      } else if (isDeleting && charIndex === 0) {
+        // Finished deleting, move to next category
+        setIsDeleting(false);
+        setCategoryIndex((categoryIndex + 1) % categories.length);
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timer);
+  }, [charIndex, isDeleting, categoryIndex]);
+
+  const handleSearch = () => {
+    if (!query || query.trim() === "") return;
+    navigate(`/search?query=${query}`);
+  };
 
   return (
     <div>
       <div className="w-full py-4 lg:px-18 px-4 bg-gray-200/50 flex justify-between items-center">
         <div>
-          <h1 className="text-emerald-800 font-bold text-xl lg:text-2xl">
-            GreenLand
-          </h1>
+          <Link to="/">
+            <h1 className="text-emerald-800 font-bold text-xl lg:text-2xl hover:text-emerald-900 transition cursor-pointer">
+              GreenLand
+            </h1>
+          </Link>
         </div>
         <div className="hidden lg:flex items-center gap-10 text-md font-medium text-gray-700">
           <Link
@@ -62,18 +103,19 @@ const Navbar = () => {
 
         <div className="hidden lg:flex items-center w-72 h-11 rounded-full border border-gray-300 overflow-hidden shadow-sm">
           <input
+            value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
               if(e.key === "Enter") handleSearch()
             }}
             type="text"
-            placeholder="Search..."
+            placeholder={placeholder}
             className="px-3 w-full bg-white h-full outline-none text-sm text-gray-700 placeholder-gray-400"
           />
 
           <button 
-          onClick={ handleSearch}
-          className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer transition h-full px-3 flex items-center justify-center">
+            onClick={handleSearch}
+            className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer transition h-full px-3 flex items-center justify-center">
             <Search className="w-5 h-5 text-white" />
           </button>
         </div>
