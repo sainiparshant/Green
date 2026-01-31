@@ -18,7 +18,7 @@ router.post("/refresh", regenrateAccessToken);
 // admin
 router.post("/admin/login", adminLogin);
 router.get("/admin/me" , adminAuth,authCheck);
-router.get("/admin/logout", adminAuth, adminLogout);
+router.post("/admin/logout", adminAuth, adminLogout);
 
 
 export default router;

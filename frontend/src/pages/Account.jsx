@@ -4,7 +4,6 @@ import {
   MapPin,
   ShoppingBag,
   LogOut,
-  UserCircle,
   ImageOff,
 } from "lucide-react";
 import Profile from "../components/account/Profile";
