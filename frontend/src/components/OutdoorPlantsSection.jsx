@@ -12,7 +12,7 @@ const OutdoorPlantsSection = () => {
 
   const fetchOutdoorPlants = async () => {
     try {
-      const { data } = await API.get("/products/all/plants?category=Outdoor&available=true&limit=6");
+      const { data } = await API.get("/products/all/plants?category=Outdoor&available=true&limit=8");
       setPlants(data.data.docs);
     } catch (error) {
       toast.error("Server Error");
@@ -35,50 +35,52 @@ const OutdoorPlantsSection = () => {
   }
 
   return (
-    <section className="py-8 md:py-12 px-4 md:px-10 bg-gradient-to-br from-green-50 to-emerald-50">
+    <section className="py-12 md:py-16 px-4 md:px-10 bg-gradient-to-br from-green-50 to-emerald-50">
       <div className="max-w-7xl mx-auto">
-        {/* Header with Icons */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <Sun className="text-orange-500" size={32} />
-            <h2 className="text-2xl md:text-4xl font-medium text-gray-900">
-              Outdoor Plants Collection
-            </h2>
-            <TreePine className="text-green-600" size={32} />
-          </div>
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-medium text-gray-900 mb-3">
+            Outdoor Plants Collection
+          </h2>
           <p className="text-gray-600 text-sm md:text-lg">
-            Hardy plants perfect for your garden, balcony, and outdoor spaces
+            Hardy plants perfect for your garden and balcony
           </p>
         </div>
 
-        {/* Features */}
-        <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8">
-          <div className="flex items-center gap-2 text-sm md:text-base text-gray-700">
-            <Sun className="text-yellow-500" size={20} />
-            <span>Sun Loving</span>
+        {/* Features Strip */}
+        <div className="flex flex-wrap justify-center gap-6 md:gap-12 mb-10">
+          <div className="flex items-center gap-2">
+            <Sun className="text-yellow-500" size={24} />
+            <span className="text-sm md:text-base font-medium text-gray-700">Sun Loving</span>
           </div>
-          <div className="flex items-center gap-2 text-sm md:text-base text-gray-700">
-            <Droplets className="text-blue-500" size={20} />
-            <span>Low Maintenance</span>
+          <div className="flex items-center gap-2">
+            <Droplets className="text-blue-500" size={24} />
+            <span className="text-sm md:text-base font-medium text-gray-700">Low Maintenance</span>
           </div>
-          <div className="flex items-center gap-2 text-sm md:text-base text-gray-700">
-            <TreePine className="text-green-600" size={20} />
-            <span>All Weather Hardy</span>
+          <div className="flex items-center gap-2">
+            <TreePine className="text-green-600" size={24} />
+            <span className="text-sm md:text-base font-medium text-gray-700">Weather Hardy</span>
           </div>
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6">
-          {plants.map((plant) => (
-            <ProductCard key={plant._id} product={plant} />
-          ))}
-        </div>
+        {plants.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+            {plants.map((plant) => (
+              <ProductCard key={plant._id} product={plant} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No outdoor plants available at the moment</p>
+          </div>
+        )}
 
         {/* View All Button */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-10">
           <Link to="/plants?category=Outdoor">
             <button className="bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors shadow-md">
-              Explore All Outdoor Plants
+              View All Outdoor Plants
             </button>
           </Link>
         </div>
