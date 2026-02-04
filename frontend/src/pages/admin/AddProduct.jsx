@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, redirect, useNavigate } from "react-router-dom";
 import API from "../../api/axios";
+import { useRef } from "react";
 
 const AddProduct = () => {
   const [product, setProduct] = useState({
@@ -34,8 +35,37 @@ const AddProduct = () => {
     weight: "",
   });
 
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const validate = () => {
+  const err = {};
+
+    if (!product.name) err.name = "Product name is required";
+    if (!product.title) err.title = "Title is required";
+    if (!product.price) err.price = "Price is required";
+    if (!product.stock) err.stock = "Stock is required";
+    if (!product.productType) err.productType = "Select product type";
+
+    if (product.productType === "Plant") {
+      if (!plantDetails.category) err.category = "Category is required";
+      if (!plantDetails.water) err.water = "Water requirement is required";
+    }
+
+    if (product.productType === "Pot") {
+      if (!potDetails.material) err.material = "Material is required";
+    }
+
+    setErrors(err);
+    return Object.keys(err).length === 0;
+  };
+
+
   const submitHandler = async(e) => {
     e.preventDefault();
+    if(!validate()) return;
+    setLoading(true);
 
     const formData = new FormData();
 
@@ -60,15 +90,17 @@ const AddProduct = () => {
       const { data } = await API.post("/admin/add-product", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log(data);
       alert("Product added successfully");
+      navigate("/admin/products");
     } catch (error) {
       console.log(error);
+    } finally{
+      setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8 pb-24">
       <div className="mb-6">
         <Link
           to="/admin/products"
@@ -87,12 +119,13 @@ const AddProduct = () => {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 max-w-5xl mx-auto">
-        <form className="space-y-8" onSubmit={submitHandler}>
+        <form className="space-y-8" onSubmit={submitHandler} >
           <Section title="Basic Information">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 placeholder="Product name"
                 value={product.name}
+                 error={errors.name}
                 onChange={(e) =>
                   setProduct({ ...product, name: e.target.value })
                 }
@@ -100,6 +133,7 @@ const AddProduct = () => {
               <Input
                 placeholder="Title"
                 value={product.title}
+                error={errors.title}
                 onChange={(e) =>
                   setProduct({ ...product, title: e.target.value })
                 }
@@ -108,6 +142,7 @@ const AddProduct = () => {
                 type="number"
                 placeholder="Price"
                 value={product.price}
+                error={errors.price}
                 onChange={(e) =>
                   setProduct({ ...product, price: e.target.value })
                 }
@@ -116,6 +151,7 @@ const AddProduct = () => {
                 type="number"
                 placeholder="Stock"
                 value={product.stock}
+                error={errors.stock}
                 onChange={(e) =>
                   setProduct({ ...product, stock: e.target.value })
                 }
@@ -124,9 +160,10 @@ const AddProduct = () => {
           </Section>
 
           <Section title="Product Type">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-4 ">
               <select
                 value={product.productType}
+                error={errors.productType}
                 onChange={(e) =>
                   setProduct({ ...product, productType: e.target.value })
                 }
@@ -158,6 +195,7 @@ const AddProduct = () => {
               placeholder="Product description"
               className="input"
               value={product.description}
+              error={errors.description}
               onChange={(e) =>
                 setProduct({ ...product, description: e.target.value })
               }
@@ -168,7 +206,6 @@ const AddProduct = () => {
             <input
               type="file"
               multiple
-
               className="input"
               onChange={(e) => setImages([...e.target.files])}
             />
@@ -183,6 +220,7 @@ const AddProduct = () => {
                 <Input
                   placeholder="Category"
                   value={plantDetails.category}
+                  error={errors.category}
                   onChange={(e) =>
                     setPlantDetails({
                       ...plantDetails,
@@ -193,12 +231,13 @@ const AddProduct = () => {
                 <select
                 className="input"
                 value={plantDetails.water}
+                error={errors.water}
                 onChange={(e) =>
                   setPlantDetails({ ...plantDetails, water: e.target.value })
                 }
               >
                 <option value="">Water requirement</option>
-                <option value="light">Light</option>
+                <option value="Light">Light</option>
                 <option value="Medium">Medium</option>
                 <option value="Heavy">Heavy</option>
               </select>
@@ -324,10 +363,17 @@ const AddProduct = () => {
             </Link>
             <button
               type="submit"
-              className="px-6 py-2 bg-emerald-700 text-white rounded-md text-sm font-semibold hover:bg-emerald-600 transition"
+              disabled={loading}
+              className={`px-6 py-2 rounded-md text-sm font-semibold transition cursor-pointer
+                ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-emerald-700 hover:bg-emerald-600 text-white"
+                }`}
             >
-              Save Product
+              {loading ? "Saving..." : "Save Product"}
             </button>
+
           </div>
         </form>
       </div>
@@ -335,9 +381,29 @@ const AddProduct = () => {
   );
 };
 
-const Input = ({ type = "text", placeholder , value, onChange}) => (
-  <input type={type} placeholder={placeholder} className="input" value={value} onChange={onChange} />
+const Input = ({
+  type = "text",
+  placeholder,
+  value,
+  onChange,
+  error,
+}) => (
+  <div className="space-y-1">
+    {error && (
+      <p className="text-xs text-red-600 font-medium">{error}</p>
+    )}
+    <input
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className={`input ${
+        error ? "border-red-500 focus:ring-red-500" : ""
+      }`}
+    />
+  </div>
 );
+
 
 const Section = ({ title, children }) => (
   <div className="space-y-3">

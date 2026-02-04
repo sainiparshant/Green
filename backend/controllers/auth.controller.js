@@ -113,11 +113,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
     );
 });
 
-const getUserProfile = asyncHandler(async (req, res) => {
-  await res
-    .status(200)
-    .json(new ApiResponse(200, "user fetched successfully", true, req.user));
-});
+
 
 const logoutUser = asyncHandler(async (req, res) => {
 
@@ -250,19 +246,7 @@ const authCheck = asyncHandler( async(req,res) =>{
     );
 });
 
-const getAdminProfile = asyncHandler(async(req,res) =>{
 
-   return res
-   .status(200)
-   .json(
-    new ApiResponse(
-        200,
-        "Profile fetched",
-        "true",
-        req.user,
-    )
-   );
-});
 
 const adminLogout = asyncHandler(async (req, res) => {
 
@@ -289,11 +273,9 @@ const adminLogout = asyncHandler(async (req, res) => {
 export { 
   registerUser, 
   verifyOtp, 
-  getUserProfile , 
   logoutUser,
   adminLogin,
   regenrateAccessToken,
-  getAdminProfile,
   adminLogout,
   authCheck
 };

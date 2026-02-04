@@ -80,14 +80,14 @@ const Login = () => {
               >
                 Phone Number
               </label>
-              <div className="flex gap-2">
+              <div className="flex space-x-2">
                 <input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 0000000000"
-                  className="flex-1 px-4 py-3 rounded-lg border border-sage-200 bg-sage-50 text-sage-900 placeholder-sage-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition disabled:opacity-60"
+                  className="flex-1 px-2 py-3 rounded-lg border border-sage-200 bg-sage-50 text-sage-900 placeholder-sage-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition disabled:opacity-60"
                   required
                 />
                 <button

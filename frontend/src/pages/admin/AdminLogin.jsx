@@ -23,11 +23,11 @@ const AdminLogin = () => {
 
             if(data.success){
                 toast.success(data.message);
-                dispatch(setUser(data));
+                dispatch(setUser(data.data));
 
                 setTimeout(() => {
                 navigate("/admin/dashboard");
-                }, 1000);
+                }, 100);
 
             }else{
                 toast.error("Invalid Credientials");
