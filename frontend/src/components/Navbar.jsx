@@ -1,162 +1,339 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { useSelector } from "react-redux";
-import API from "../api/axios";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+  
   const cartCount = useSelector(state => state.cart.items.length);
-  const auth = useSelector(state => state.auth.isAuth);  
-  const [query, setQuery] = useState("");
+  const auth = useSelector(state => state.auth.isAuth);
+  
+  const [desktopQuery, setDesktopQuery] = useState("");
+  const [mobileQuery, setMobileQuery] = useState("");
+  const [placeholder, setPlaceholder] = useState("");
+  const [categoryIndex, setCategoryIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchRef = useRef(null);
 
-  const handleSearch = () => {
-  if (!query || query.trim() === "") return;
+  const categories = [
+    "Search for outdoor plants...",
+    "Search for indoor plants...",
+    "Search for flowers...",
+    "Search for pots..."
+  ];
 
-  navigate(`/search?query=${query}`);
-};
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
+
+  // Scroll detection for sticky navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Typewriter effect - works for both desktop and mobile
+  useEffect(() => {
+    // Pause animation only when user is actively typing in desktop OR mobile
+    if (desktopQuery.length > 0 || mobileQuery.length > 0) return;
+
+    const typingSpeed = isDeleting ? 50 : 100;
+    const pauseTime = 2000;
+
+    const timer = setTimeout(() => {
+      const currentCategory = categories[categoryIndex];
+
+      if (!isDeleting && charIndex < currentCategory.length) {
+        setPlaceholder(currentCategory.substring(0, charIndex + 1));
+        setCharIndex(charIndex + 1);
+      } else if (isDeleting && charIndex > 0) {
+        setPlaceholder(currentCategory.substring(0, charIndex - 1));
+        setCharIndex(charIndex - 1);
+      } else if (!isDeleting && charIndex === currentCategory.length) {
+        setTimeout(() => setIsDeleting(true), pauseTime);
+      } else if (isDeleting && charIndex === 0) {
+        setIsDeleting(false);
+        setCategoryIndex((categoryIndex + 1) % categories.length);
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timer);
+  }, [charIndex, isDeleting, categoryIndex, desktopQuery, mobileQuery]);
+
+  // Close search suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
+  const handleDesktopSearch = () => {
+    if (!desktopQuery || desktopQuery.trim() === "") return;
+    navigate(`/search?query=${desktopQuery}`);
+    setShowSearchSuggestions(false);
+    setDesktopQuery("");
+  };
+
+  const handleMobileSearch = () => {
+    if (!mobileQuery || mobileQuery.trim() === "") return;
+    navigate(`/search?query=${mobileQuery}`);
+    setMobileQuery("");
+    setIsMobileMenuOpen(false);
+  };
+
+  const navLinks = [
+    { to: "/", label: "Home" },
+    { to: "/plants", label: "Plants" },
+    { to: "/pots", label: "Pots" },
+    { to: "/contact", label: "Contact" }
+  ];
 
   return (
-    <div>
-      <div className="w-full py-4 lg:px-18 px-4 bg-gray-200/50 flex justify-between items-center">
-        <div>
-          <h1 className="text-emerald-800 font-bold text-xl lg:text-2xl">
-            GreenLand
-          </h1>
-        </div>
-        <div className="hidden lg:flex items-center gap-10 text-md font-medium text-gray-700">
-          <Link
-            to="/"
-            className="relative group transition hover:text-emerald-600"
-          >
-            Home
-            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-emerald-600 transition-all duration-300 group-hover:w-full"></span>
-          </Link>
-
-          <Link
-            to="/plants"
-            className="relative group transition hover:text-emerald-600"
-          >
-            Plants
-            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-emerald-600 transition-all duration-300 group-hover:w-full"></span>
-          </Link>
-
-          <Link
-            to="/pots"
-            className="relative group transition hover:text-emerald-600"
-          >
-            Pots
-            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-emerald-600 transition-all duration-300 group-hover:w-full"></span>
-          </Link>
-
-          <Link
-            to="/contact"
-            className="relative group transition hover:text-emerald-600"
-          >
-            Contact
-            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-emerald-600 transition-all duration-300 group-hover:w-full"></span>
-          </Link>
-        </div>
-
-        <div className="hidden lg:flex items-center w-72 h-11 rounded-full border border-gray-300 overflow-hidden shadow-sm">
-          <input
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if(e.key === "Enter") handleSearch()
-            }}
-            type="text"
-            placeholder="Search..."
-            className="px-3 w-full bg-white h-full outline-none text-sm text-gray-700 placeholder-gray-400"
-          />
-
-          <button 
-          onClick={ handleSearch}
-          className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer transition h-full px-3 flex items-center justify-center">
-            <Search className="w-5 h-5 text-white" />
-          </button>
-        </div>
-
-        <div className="flex justify-between gap-6 cursor-pointer">
-         <Link to="/checkout/cart" className="relative inline-block">
-      <ShoppingCart className="text-gray-800 hover:text-emerald-700 transition" size={26} />
-
-      {cartCount > 0 && (
-        <span className="absolute -top-2 -right-2 bg-emerald-700 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
-          {cartCount}
-        </span>
-      )}
-    </Link>
-          <Link to={auth === false ? "/login" : "/account"}>
-            <User />
-          </Link>
-          {isMobileMenuOpen ? (
-            <X
-              className="lg:hidden cursor-pointer"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-          ) : (
-            <Menu
-              className="lg:hidden cursor-pointer"
-              onClick={() => setIsMobileMenuOpen(true)}
-            />
-          )}
-        </div>
-      </div>
-
-      <div className="block lg:hidden ">
-        <div className="flex items-center bg-white border border-gray-300 shadow-sm overflow-hidden">
-
-          <button className="p-2 cursor-pointer">
-            <Search className="w-4 h-4" />
-          </button>
-          <input
-            type="text"
-            placeholder="Search plants, pots..."
-            className="w-full pl-2 py-2 text-sm outline-none text-gray-700 placeholder-gray-400 rounded-full"
-          />
-        </div>
-      </div>
-
-      {isMobileMenuOpen && (
-        <div className="lg:hidden fixed min-h-screen top-15 left-0 w-full bg-white  z-50">
-          <div className="flex flex-col py-4 text-sm font-medium text-gray-700">
-            <Link
-              to="/"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-5 py-3 hover:bg-emerald-50 hover:text-emerald-600 transition"
-            >
-              Home
-            </Link>
-
-            <Link
-              to="/plants"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-5 py-3 hover:bg-emerald-50 hover:text-emerald-600 transition"
-            >
-              Plants
-            </Link>
-
-            <Link
-              to="/pots"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-5 py-3 hover:bg-emerald-50 hover:text-emerald-600 transition"
-            >
-              Pots
-            </Link>
-
-            <Link
-              to="/contact"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-5 py-3 hover:bg-emerald-50 hover:text-emerald-600 transition"
-            >
-              Contact
+    <>
+      {/* Main Navbar */}
+      <nav 
+        className={`w-full sticky top-0 z-50 transition-all duration-300 ${
+          isScrolled 
+            ? 'bg-white shadow-md py-3' 
+            : 'bg-gray-200/50 py-4'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 flex justify-between items-center">
+          {/* Logo */}
+          <div>
+            <Link to="/" aria-label="GreenLand Home">
+              <h1 className="text-emerald-800 font-bold text-xl lg:text-2xl hover:text-emerald-900 transition cursor-pointer">
+                🌿 GreenLand
+              </h1>
             </Link>
           </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-700">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`relative group transition hover:text-emerald-600 ${
+                  location.pathname === link.to ? 'text-emerald-600' : ''
+                }`}
+              >
+                {link.label}
+                <span className={`absolute left-0 -bottom-1 h-0.5 bg-emerald-600 transition-all duration-300 ${
+                  location.pathname === link.to ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Desktop Search */}
+          <div 
+            ref={searchRef}
+            className="hidden lg:flex relative items-center w-80 h-11 rounded-full border border-gray-300 overflow-hidden shadow-sm bg-white"
+          >
+            <input
+              value={desktopQuery}
+              onChange={(e) => {
+                setDesktopQuery(e.target.value);
+                setShowSearchSuggestions(e.target.value.length > 0);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleDesktopSearch();
+              }}
+              onFocus={() => desktopQuery && setShowSearchSuggestions(true)}
+              type="text"
+              placeholder={desktopQuery ? "Type to search..." : placeholder}
+              className="px-4 w-full h-full outline-none text-sm text-gray-700 placeholder-gray-400"
+              aria-label="Search products"
+            />
+
+            <button
+              onClick={handleDesktopSearch}
+              className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer transition h-full px-4 flex items-center justify-center"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5 text-white" />
+            </button>
+
+            {/* Search Suggestions Dropdown (Optional) */}
+            {showSearchSuggestions && desktopQuery.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                <div className="p-3 text-xs text-gray-500">
+                  Press Enter to search for "{desktopQuery}"
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Icons */}
+          <div className="hidden lg:flex items-center gap-6">
+            <Link 
+              to="/checkout/cart" 
+              className="relative"
+              aria-label={`Shopping cart with ${cartCount} items`}
+            >
+              <ShoppingCart className="w-6 h-6 text-gray-700 hover:text-emerald-600 transition" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-emerald-600 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount > 9 ? '9+' : cartCount}
+                </span>
+              )}
+            </Link>
+
+            <Link 
+              to={auth ? "/account" : "/login"}
+              aria-label={auth ? "My Account" : "Login"}
+            >
+              <User className="w-6 h-6 text-gray-700 hover:text-emerald-600 transition" />
+            </Link>
+          </div>
+
+          {/* Mobile Icons */}
+          <div className="flex lg:hidden items-center gap-4">
+            <Link 
+              to="/checkout/cart" 
+              className="relative"
+              aria-label={`Shopping cart with ${cartCount} items`}
+            >
+              <ShoppingCart className="w-6 h-6 text-gray-700" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-emerald-600 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount > 9 ? '9+' : cartCount}
+                </span>
+              )}
+            </Link>
+
+            <Link to={auth ? "/account" : "/login"} aria-label={auth ? "My Account" : "Login"}>
+              <User className="w-6 h-6 text-gray-700" />
+            </Link>
+
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-gray-700"
+              aria-expanded={isMobileMenuOpen}
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Search Bar */}
+        <div className="lg:hidden mt-3 px-4">
+          <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm overflow-hidden h-11">
+            <input
+              value={mobileQuery}
+              onChange={(e) => setMobileQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleMobileSearch();
+              }}
+              type="text"
+              placeholder={mobileQuery ? "Type to search..." : placeholder}
+              className="w-full px-4 h-full outline-none text-sm text-gray-700 placeholder-gray-400"
+              aria-label="Search products"
+            />
+            <button
+              onClick={handleMobileSearch}
+              className="bg-emerald-600 hover:bg-emerald-700 transition h-full px-4 flex items-center justify-center"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Mobile Menu */}
+          <div className="fixed top-[8rem] left-0 right-0 bottom-0 bg-white z-50 lg:hidden overflow-y-auto">
+            <div className="flex flex-col text-sm font-medium text-gray-700">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`px-6 py-4 hover:bg-emerald-50 hover:text-emerald-600 transition border-b border-gray-100 ${
+                    location.pathname === link.to ? 'bg-emerald-50 text-emerald-600' : ''
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+
+              {auth ? (
+                <>
+                  <Link
+                    to="/account"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-6 py-4 hover:bg-emerald-50 hover:text-emerald-600 transition border-b border-gray-100"
+                  >
+                    My Account
+                  </Link>
+                  <Link
+                    to="/orders"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-6 py-4 hover:bg-emerald-50 hover:text-emerald-600 transition border-b border-gray-100"
+                  >
+                    My Orders
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-6 py-4 bg-emerald-600 text-white hover:bg-emerald-700 transition text-center font-semibold"
+                >
+                  Login / Sign Up
+                </Link>
+              )}
+            </div>
+          </div>
+        </>
       )}
-    </div>
+    </>
   );
 };
 

@@ -4,16 +4,16 @@ import API from '../api/axios';
 import { toast } from "react-toastify";
 import { Loader } from './Loader';
 import { Link } from 'react-router-dom';
-import { Palette, Sparkles, Award } from 'lucide-react';
+import { Sun, Droplets, TreePine } from 'lucide-react';
 
-const FeaturedPotSection = () => {
-  const [pots, setPots] = useState([]);
+const OutdoorPlantsSection = () => {
+  const [plants, setPlants] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const AllPots = async () => {
+  const fetchOutdoorPlants = async () => {
     try {
-      const { data } = await API.get("/products/all/pots?featured=true&available=true&limit=8");
-      setPots(data.data.docs);
+      const { data } = await API.get("/products/all/plants?category=Outdoor&available=true&limit=8");
+      setPlants(data.data.docs);
     } catch (error) {
       toast.error("Server Error");
       console.log(error);
@@ -23,7 +23,7 @@ const FeaturedPotSection = () => {
   };
 
   useEffect(() => {
-    AllPots();
+    fetchOutdoorPlants();
   }, []);
 
   if (loading) {
@@ -35,52 +35,52 @@ const FeaturedPotSection = () => {
   }
 
   return (
-    <section className="py-12 md:py-16 px-4 md:px-10 bg-white">
+    <section className="py-12 md:py-16 px-4 md:px-10 bg-gradient-to-br from-green-50 to-emerald-50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-medium text-gray-900 mb-3">
-            Ceramic Flowering Pots
+            Outdoor Plants Collection
           </h2>
           <p className="text-gray-600 text-sm md:text-lg">
-            Artisan-designed pots to complement your beautiful plants
+            Hardy plants perfect for your garden and balcony
           </p>
         </div>
 
         {/* Features Strip */}
         <div className="flex flex-wrap justify-center gap-6 md:gap-12 mb-10">
           <div className="flex items-center gap-2">
-            <Palette className="text-amber-500" size={24} />
-            <span className="text-sm md:text-base font-medium text-gray-700">Unique Designs</span>
+            <Sun className="text-yellow-500" size={24} />
+            <span className="text-sm md:text-base font-medium text-gray-700">Sun Loving</span>
           </div>
           <div className="flex items-center gap-2">
-            <Award className="text-emerald-600" size={24} />
-            <span className="text-sm md:text-base font-medium text-gray-700">Premium Quality</span>
+            <Droplets className="text-blue-500" size={24} />
+            <span className="text-sm md:text-base font-medium text-gray-700">Low Maintenance</span>
           </div>
           <div className="flex items-center gap-2">
-            <Sparkles className="text-purple-500" size={24} />
-            <span className="text-sm md:text-base font-medium text-gray-700">Handcrafted</span>
+            <TreePine className="text-green-600" size={24} />
+            <span className="text-sm md:text-base font-medium text-gray-700">Weather Hardy</span>
           </div>
         </div>
 
         {/* Products Grid */}
-        {pots.length > 0 ? (
+        {plants.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
-            {pots.map((pot) => (
-              <ProductCard key={pot._id} product={pot} />
+            {plants.map((plant) => (
+              <ProductCard key={plant._id} product={plant} />
             ))}
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-500">No pots available at the moment</p>
+            <p className="text-gray-500">No outdoor plants available at the moment</p>
           </div>
         )}
 
         {/* View All Button */}
         <div className="text-center mt-10">
-          <Link to="/pots">
-            <button className="border-2 border-emerald-600 text-emerald-600 px-8 py-2 rounded-lg font-semibold hover:bg-emerald-600 hover:text-white transition-colors">
-              View All Pots
+          <Link to="/plants?category=Outdoor">
+            <button className="bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors shadow-md">
+              View All Outdoor Plants
             </button>
           </Link>
         </div>
@@ -89,4 +89,4 @@ const FeaturedPotSection = () => {
   );
 };
 
-export default FeaturedPotSection;
+export default OutdoorPlantsSection;
