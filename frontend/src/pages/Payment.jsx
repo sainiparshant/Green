@@ -92,14 +92,6 @@ const Payment = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-28">
 
-     
-      <div className="flex items-center justify-between px-4 py-5 sm:px-6 bg-white border-b shadow-sm">
-        <Wallet className="text-emerald-700" size={24} />
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
-          Payment
-        </h1>
-        <ShieldCheck className="text-blue-700" size={24} />
-      </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-4 sm:px-6 mt-6">
 

@@ -60,8 +60,8 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-        </Route>
-        <Route
+
+           <Route
           path="/checkout/cart"
           element={
             <ProtectedRoute role="user">
@@ -85,6 +85,8 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        </Route>
+       
 
         <Route path="/admin/login" element={<AdminLogin />} />
 

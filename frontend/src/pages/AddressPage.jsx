@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Edit2, Trash2, X, LocationEdit } from "lucide-react";
+import { Plus, Edit2, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
 import API from "../api/axios";
 import { Link } from "react-router-dom";
@@ -10,16 +10,12 @@ const AddressPage = () => {
   const [addresses, setAddresses] = useState([]);
   const [currentAddress, setCurrentAddress] = useState(null);
 
-
   const fetchAddresses = async () => {
     try {
       const data = await API.get("/address/get-addrs");
-      
       setAddresses(data.data.data);
-
     } catch (error) {
       toast.error("Failed to fetch addresses");
-      console.log(error);
     }
   };
 
@@ -28,136 +24,125 @@ const AddressPage = () => {
       await API.patch(`/address/update-default/${id}`, { isDefault: true });
       toast.success("Default address updated");
       fetchAddresses();
-    } catch (error) {
+    } catch {
       toast.error("Failed to set default address");
-      console.log(error);
-      
     }
   };
 
   const deleteAddress = async (id) => {
     try {
-      
       await API.delete(`/address/remove-addr/${id}`);
       toast.success("Address deleted successfully");
       fetchAddresses();
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete address");
-      console.log(error);
-      
     }
   };
-
 
   useEffect(() => {
     fetchAddresses();
   }, []);
 
   return (
-    <div className="min-h-screen">
-      <div className="flex items-center justify-between gap-2 sm:gap-3 px-4 py-5 bg-white border-b border-gray-200 shadow-sm">
-      <Link to="/">
-        <h1 className="text-emerald-700 hover:text-emerald-900 transition font-bold "  >
-          Home
-        </h1>
-      </Link>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto px-2 py-8 pb-32">
 
-      <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
-        Addresses
-      </h1>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg md:text-2xl font-semibold text-gray-900">
+            Saved Addresses
+          </h2>
 
-      <Link to="/checkout/cart">
-        <LocationEdit className="text-blue-700 hover:text-blue-900 transition" size={24} />
-      </Link>
-    </div>
-    <div className="p-2 md:p-10 pb-24">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-sm md:text-xl font-semibold text-gray-900">
-          Addresses
-        </h2>
-
-        <button
-          onClick={() => {
-            setEditMode(false);
-            setCurrentAddress(null);
-            setOpen(true);
-          }}
-          className="flex items-center gap-2 bg-emerald-600 text-white px-2 sm:px-4 py-2 rounded-lg text-sm hover:bg-emerald-700"
-        >
-          <Plus size={16} />
-          New
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {addresses.map((addr) => (
-          <div
-            className="border rounded-xl p-4 bg-white shadow-sm relative"
-            key={addr._id}
+          <button
+            onClick={() => {
+              setEditMode(false);
+              setCurrentAddress(null);
+              setOpen(true);
+            }}
+            className="inline-flex items-center gap-2 rounded-lg border border-emerald-600 bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
           >
-            <div className="absolute top-3 right-3">
-              <input
-                type="radio"
-                name="defaultAddress"
-                checked={addr.isDefault}
-                onChange={() => setDefaultAddress(addr._id)}
-                className="w-4 h-4 accent-emerald-600 cursor-pointer"
-              />
+            <Plus size={16} />
+            Add Address
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {addresses.map((addr) => (
+            <div
+              key={addr._id}
+              className={`relative rounded-xl border bg-white p-5 transition-shadow ${
+                addr.isDefault
+                  ? "border-emerald-600 shadow-md"
+                  : "border-gray-200 hover:shadow-sm"
+              }`}
+            >
+              <div className="absolute top-4 right-4">
+                <input
+                  type="radio"
+                  name="defaultAddress"
+                  checked={addr.isDefault}
+                  onChange={() => setDefaultAddress(addr._id)}
+                  className="w-4 h-4 accent-emerald-600"
+                />
+              </div>
+
+              {addr.isDefault && (
+                <span className="inline-block mb-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+                  Default
+                </span>
+              )}
+
+              <h3 className="font-medium text-gray-900">
+                {addr.fullName}
+              </h3>
+
+              <p className="text-sm text-gray-600 mt-1">
+                {addr.phone}
+              </p>
+
+              <p className="mt-3 text-sm text-gray-700 leading-relaxed">
+                {addr.address}, {addr.city}, {addr.state} – {addr.pinCode}
+              </p>
+
+              <div className="mt-5 flex items-center gap-4">
+                <button
+                  onClick={() => {
+                    setCurrentAddress(addr);
+                    setEditMode(true);
+                    setOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900"
+                >
+                  <Edit2 size={14} />
+                  Edit
+                </button>
+
+                <button
+                  onClick={() => deleteAddress(addr._id)}
+                  className="inline-flex items-center gap-1 text-sm text-red-500 hover:text-red-600"
+                >
+                  <Trash2 size={14} />
+                  Delete
+                </button>
+              </div>
             </div>
+          ))}
+        </div>
 
-            <h3 className="font-semibold text-gray-900">
-              {addr.fullName}
-            </h3>
-
-            <p className="text-sm text-gray-600 mt-1">
-              {addr.phone}
-            </p>
-
-            <p className="text-sm text-gray-700 mt-2">
-              {addr.address}, {addr.city}, <br />
-              {addr.state} – {addr.pinCode}
-            </p>
-
-            <div className="flex items-center gap-4 mt-4">
-              <button
-                onClick={() => {
-                  setCurrentAddress(addr);
-                  setEditMode(true);
-                  setOpen(true);
-                }}
-                className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-800"
-              >
-                <Edit2 size={14} />
-                Edit
-              </button>
-
-              <button
-                onClick={() => deleteAddress(addr._id)}
-                className="flex items-center gap-1 text-sm text-red-500 hover:text-red-600"
-              >
-                <Trash2 size={14} />
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
+        {open && (
+          <AddressModal
+            editMode={editMode}
+            onClose={() => setOpen(false)}
+            addressData={currentAddress}
+            refreshList={fetchAddresses}
+          />
+        )}
       </div>
 
-      {open && (
-        <AddressModal
-          editMode={editMode}
-          onClose={() => setOpen(false)}
-          addressData={currentAddress}
-          refreshList={fetchAddresses}
-        />
-      )}
-      </div>
-
-       <div className="fixed bottom-0 left-0 w-full px-4 py-3 bg-white shadow-md">
-        <Link to={"/checkout/payment"}>
-        <button className="bg-emerald-600 text-white w-full py-3 rounded-lg text-sm font-medium hover:bg-emerald-700">
-          Proceed to Payment
-        </button>
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 px-4 py-4">
+        <Link to="/checkout/payment">
+          <button className="w-full rounded-lg bg-emerald-600 py-3 text-sm font-medium text-white hover:bg-emerald-700">
+            Proceed to Payment
+          </button>
         </Link>
       </div>
     </div>
@@ -189,32 +174,25 @@ const AddressModal = ({ editMode, onClose, addressData, refreshList }) => {
     }
   }, [editMode, addressData]);
 
-
   const submitHandler = async () => {
     try {
       if (editMode) {
-        
         await API.patch(`/address/update-addr/${addressData._id}`, formData);
-
         toast.success("Address updated successfully");
       } else {
         await API.post("/address/add-addr", formData);
-
         toast.success("Address saved successfully");
       }
-
       refreshList();
       onClose();
-    } catch (error) {
+    } catch {
       toast.error("Failed to save address");
     }
   };
 
-
-
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
-      <div className="bg-white w-full max-w-lg rounded-xl p-6 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="relative w-full max-w-lg rounded-xl bg-white p-6">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -222,7 +200,7 @@ const AddressModal = ({ editMode, onClose, addressData, refreshList }) => {
           <X size={18} />
         </button>
 
-        <h3 className="text-lg font-semibold mb-4">
+        <h3 className="mb-5 text-lg font-semibold text-gray-900">
           {editMode ? "Edit Address" : "Add New Address"}
         </h3>
 
@@ -242,10 +220,10 @@ const AddressModal = ({ editMode, onClose, addressData, refreshList }) => {
               onChange={(e) =>
                 setFormData({ ...formData, [key]: e.target.value })
               }
-              className={`outline-none border border-gray-300 rounded-lg px-3 py-2 ${
+              placeholder={placeholder}
+              className={`rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 ${
                 key === "address" ? "sm:col-span-2" : ""
               }`}
-              placeholder={placeholder}
             />
           ))}
         </form>
@@ -253,14 +231,14 @@ const AddressModal = ({ editMode, onClose, addressData, refreshList }) => {
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm rounded-lg border"
+            className="rounded-lg border px-4 py-2 text-sm"
           >
             Cancel
           </button>
 
           <button
             onClick={submitHandler}
-            className="px-5 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+            className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700"
           >
             {editMode ? "Update Address" : "Save Address"}
           </button>
