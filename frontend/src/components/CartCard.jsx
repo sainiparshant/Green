@@ -2,20 +2,33 @@ import { Trash2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { removeItem, updateQuantity } from "../redux/cartSlice";
 
-const CartCard = ({ image, name, title, price, quantity, size, productId }) => {
+const CartCard = ({
+  image,
+  name,
+  title,
+  price,
+  quantity,
+  size,
+  productId,
+  variantId,
+}) => {
   const dispatch = useDispatch();
 
   const decrease = async () => {
     if (quantity <= 1) return;
-    await dispatch(updateQuantity({ productId, quantity: quantity - 1 }));
+    await dispatch(
+      updateQuantity({ productId, quantity: quantity - 1, variantId }),
+    );
   };
 
   const increase = async () => {
-    await dispatch(updateQuantity({ productId, quantity: quantity + 1 }));
+    await dispatch(
+      updateQuantity({ productId, quantity: quantity + 1, variantId }),
+    );
   };
 
   const handleRemove = async () => {
-    await dispatch(removeItem({ productId }));
+    await dispatch(removeItem({ variantId }));
   };
 
   return (
@@ -32,9 +45,7 @@ const CartCard = ({ image, name, title, price, quantity, size, productId }) => {
             {name}
           </h2>
 
-          <p className="text-xs text-gray-500 line-clamp-1">
-            {title}
-          </p>
+          <p className="text-xs text-gray-500 line-clamp-1">{title}</p>
 
           {size && (
             <span className="mt-1 inline-block text-xs text-gray-500">
@@ -42,17 +53,16 @@ const CartCard = ({ image, name, title, price, quantity, size, productId }) => {
             </span>
           )}
 
-          <p className="mt-2 text-sm font-semibold text-gray-900">
-            ₹{price}
-          </p>
+          <p className="mt-2 text-sm font-semibold text-gray-900">₹{price}</p>
         </div>
 
         <div className="flex flex-col items-end justify-between">
           <button
             onClick={handleRemove}
-            className="text-gray-400 hover:text-red-500"
+            className="text-xs md:text-sm font-medium text-gray-500 cursor-pointer
+             hover:text-red-600 transition underline-offset-4 hover:underline"
           >
-            <Trash2 size={16} />
+            Remove
           </button>
 
           <div className="flex items-center gap-3 border border-gray-300 px-2 py-1">

@@ -21,8 +21,8 @@ const variantSchema =  new mongoose.Schema({
     },
     size:{
         type: String,
-        enum:["small", "medium", "large", "extra_Large"],
-        default:"small",
+        enum:["Small", "Medium", "Large", "Extra_Large"],
+        default:"Small",
     },
     height:{
         type: Number,

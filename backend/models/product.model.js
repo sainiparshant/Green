@@ -56,6 +56,10 @@ const productSchema = new mongoose.Schema({
     isFeatured:{
         type: Boolean,
         default: true
+    },
+    available:{
+        type: Boolean,
+        default: true
     }
 },{timestamps: true});
 

@@ -54,17 +54,17 @@ const NewArrivalsSection = () => {
           </p>
         </div>
 
-        {/* Trending Badge Info */}
+        
         <div className="flex items-center justify-center gap-2 mb-6 text-sm text-gray-500">
           <TrendingUp className="text-emerald-600" size={18} />
           <span>Trending among plant lovers</span>
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {products.map((product, index) => (
             <div key={product._id} className="relative">
-              {/* New Badge for first 3 items */}
+             
               {index < 3 && (
                 <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                   NEW
@@ -75,7 +75,7 @@ const NewArrivalsSection = () => {
           ))}
         </div>
 
-        {/* View All Button */}
+        
         <div className="text-center mt-8">
           <Link to="/plants">
             <button className="border-2 border-emerald-600 text-emerald-600 px-8 py-2 rounded-lg font-semibold hover:bg-emerald-600 hover:text-white transition-colors">

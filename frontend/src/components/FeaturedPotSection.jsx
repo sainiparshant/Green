@@ -37,7 +37,7 @@ const FeaturedPotSection = () => {
   return (
     <section className="py-8 px-4 md:px-10 bg-white border-b border-gray-100">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        
         <div className="text-center mb-5">
           <h2 className="text-3xl md:text-4xl font-medium text-gray-900 mb-1">
             Ceramic Flowering Pots
@@ -47,7 +47,7 @@ const FeaturedPotSection = () => {
           </p>
         </div>
 
-        {/* Features Strip */}
+        
         <div className="flex flex-wrap justify-center gap-6 md:gap-20 mb-10">
           <div className="flex items-center gap-2">
             <Palette className="text-amber-500" size={24} />
@@ -63,7 +63,7 @@ const FeaturedPotSection = () => {
           </div>
         </div>
 
-        {/* Products Grid */}
+        
         {pots.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
             {pots.map((pot) => (

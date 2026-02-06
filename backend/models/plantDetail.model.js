@@ -24,7 +24,7 @@ const plantSchema = new mongoose.Schema({
     carelevel:{
         type:String,
         required: true,
-        enum:["Easy", "Medium", "Difficult"]
+        enum:["Easy Care", "Medium Care", "Difficult Care"]
     },
     potIncluded:{
         type: Boolean,

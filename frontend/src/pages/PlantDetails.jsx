@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import StarRating from "../components/StarRating";
-import { CircleUser, Droplet, Sun, TreePalm } from "lucide-react";
+import { Droplet, Sun, TreePalm } from "lucide-react";
 import ProductImagesLayout from "../components/ProductImagesLayout";
 import PlantFeatures from "../components/PlantFeatures";
 import API from "../api/axios";
@@ -11,35 +11,28 @@ import { toast } from "react-toastify";
 import { addItem } from "../redux/cartSlice";
 import ReviewsSection from "../components/ReviewSection";
 
-
 const PlantDetails = () => {
-  const auth = useSelector((state) => state.auth.isAuth);
+  const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth.isAuth);
 
-  const [quantity, setQuantity] = useState(1);
-
-  const [plant, setPlant] = useState({});
+  const [plant, setPlant] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const [activeImage, setActiveImage] = useState("");
-
-  const decrease = () => {
-    return setQuantity(quantity - 1);
-  };
-
-  const increase = () => {
-    return setQuantity(quantity + 1);
-  };
-
-  const { id } = useParams();
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [quantity, setQuantity] = useState(1);
 
   const fetchPlantDetail = async () => {
     try {
       const { data } = await API.get(`/products/single-plant/${id}`);
-
-      setPlant(data.data[0]);
+      setPlant(data.data);
+      console.log(data.data);
+      
+      setSelectedVariant(data.data.variants[0]);
     } catch (error) {
-      console.log(error.response?.data || error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -55,160 +48,160 @@ const PlantDetails = () => {
     }
   }, [plant]);
 
+  const increase = () => {
+    if (quantity < selectedVariant.stock) {
+      setQuantity(quantity + 1);
+    }
+  };
+
+  const decrease = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
   const addToCartHandler = async () => {
-  if (!auth) {
-    navigate("/login");
-    return;
-  }
-
-  try {
-    const res = await dispatch(
-      addItem({ productId: plant._id, quantity })
-    ).unwrap();
-
-    toast.success("Item added to cart");
-
-  } catch (error) {
-    if (error.statusCode === 401) {
-      toast.error("Please login again");
+    if (!auth) {
       navigate("/login");
-    } else {
+      return;
+    }
+
+    if (!selectedVariant) {
+      toast.error("Please select a size");
+      return;
+    }
+
+    try {
+      await dispatch(
+        addItem({
+          productId: plant._id,
+          variantId: selectedVariant._id,
+          quantity
+        })
+      ).unwrap();
+
+      toast.success("Item added to cart");
+    } catch (error) {
       toast.error(error.message || "Something went wrong");
     }
-  }
-};
-
-
+  };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-20 min-h-screen">
+      <div className="flex justify-center items-center min-h-screen">
         <Loader />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen sm:m-2 md:m-5">
-      <div className="grid grid-cols-1 lg:grid-cols-2 md:gap-5 p-4 md:p-10">
-        <div className="max-w-sm md:max-w-xl">
-          <ProductImagesLayout
-            images={plant.images}
-            activeImage={activeImage}
-            setActiveImage={setActiveImage}
-          />
-        </div>
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
+        
+        <ProductImagesLayout
+          images={plant.images}
+          activeImage={activeImage}
+          setActiveImage={setActiveImage}
+        />
+
+        
         <div>
-          <div className="flex gap-2">
-            <button className="bg-gray-200 p-1 text-xs rounded">
-              {plant.size}
-            </button>
-            <button className="bg-gray-200 p-1 text-xs rounded">
-              {plant.plantDetails.carelevel}
-            </button>
+          <h1 className="text-3xl md:text-4xl font-semibold">
+            {plant.name}
+          </h1>
+
+          <p className="text-gray-500 mt-1">
+            {plant.plantDetails.category}
+          </p>
+
+          <div className="flex items-center gap-2 mt-2">
+            <StarRating rating={plant.avgRating || 4.5} />
+            <span className="text-sm text-gray-600">
+              {plant.totalReview || 0} reviews
+            </span>
           </div>
 
-          <div className="mt-1 md:mt-5 flex flex-col md:gap-2">
-            <h1 className="sm:text-4xl font-semibold text-2xl">{plant.name}</h1>
-            <p className="p italic">{plant.plantDetails.category}</p>
+          <p className="mt-4 text-gray-700">
+            {plant.title}
+          </p>
 
-            <div className="flex gap-2 items-center mt-1 md:mt-3">
-              <StarRating rating={5} />
-              <p className="p text-sm">(126 reviews)</p>
-            </div>
-
-            <div className="mt-1 md:mt-3">
-              <h1 className="text-sm md:text-lg ">{plant.title}</h1>
-            </div>
+         
+          <div className="flex gap-10 mt-6">
+            <PlantFeatures icon={<Sun />} title="Light" subtitle={plant.plantDetails.light} />
+            <PlantFeatures icon={<Droplet />} title="Water" subtitle={plant.plantDetails.water} />
+            <PlantFeatures icon={<TreePalm />} title="Care" subtitle={plant.plantDetails.carelevel} />
           </div>
 
-          <hr className="mt-2 md:mt-5 text-gray-300" />
-
-          <div className="flex items-center justify-around mt-2 md:mt-5">
-            <PlantFeatures
-              icon={<Sun className="w-4 h-4 sm:h-6 sm:w-6" />}
-              title={"Light"}
-              subtitle={plant.plantDetails.light}
-            />
-            <PlantFeatures
-              icon={<Droplet className="w-4 h-4 sm:h-6 sm:w-6" />}
-              title={"Water"}
-              subtitle={plant.plantDetails.water}
-            />
-            <PlantFeatures
-              icon={<TreePalm className="w-4 h-4 sm:h-6 sm:w-6" />}
-              title={"Care Level"}
-              subtitle={plant.plantDetails.carelevel}
-            />
+          
+          <div className="mt-6">
+            <span className="text-3xl font-semibold text-emerald-700">
+              ₹{selectedVariant.price}
+            </span>
+            <span className="ml-2 text-sm text-gray-500">
+              Free shipping over ₹500
+            </span>
           </div>
 
-          <hr className="mt-2 md:mt-5 text-gray-300" />
-
-          <div className="mt-2 md:mt-5 flex items-baseline gap-2">
-            <h1 className="text-2xl md:text-4xl font-semibold">
-              &#8377; {plant.price}
-            </h1>
-            <p className="p text-xs md:text-sm">Free shipping over 500</p>
-          </div>
-
-          <div className="mt-2 md:mt-5">
-            <div className="flex gap-5">
-              
-              <div className="flex items-center justify-between border-2 border-gray-500 rounded-lg min-w-[30%] px-2">
+         
+          <div className="mt-6">
+            <p className="text-sm font-medium mb-2">Select Size</p>
+            <div className="flex gap-3">
+              {plant.variants.map((variant) => (
                 <button
-                  onClick={decrease}
-                  className="px-3 py-2 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-md disabled:opacity-50 cursor-pointer"
-                  disabled={quantity === 1}
+                  key={variant._id}
+                  disabled={variant.stock === 0}
+                  onClick={() => {
+                    setSelectedVariant(variant);
+                    setQuantity(1);
+                  }}
+                  className={`px-4 py-2 rounded-lg border text-sm transition
+                    ${
+                      selectedVariant._id === variant._id
+                        ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                        : "border-gray-300"
+                    }
+                    ${variant.stock === 0
+                      ? "opacity-40 cursor-not-allowed"
+                      : "hover:border-emerald-600"}
+                  `}
                 >
-                  −
+                  {variant.size}
                 </button>
+              ))}
+            </div>
+          </div>
 
-                <span className="px-4 text-sm md:text-md font-semibold select-none">
-                  {quantity}
-                </span>
-
-                <button
-                  onClick={increase}
-                  className="px-3 py-2 text-lg font-medium cursor-pointer text-gray-700 hover:bg-gray-100 rounded-md"
-                >
-                  +
-                </button>
-              </div>
-
-              
-              <button
-                onClick={() => addToCartHandler()}
-                className="w-full bg-emerald-900 text-white text-sm md:text-md p-2 rounded-lg cursor-pointer"
-              >
-                Add To Cart
-              </button>
+         
+          <div className="mt-6 flex gap-4">
+            <div className="flex items-center border rounded-lg">
+              <button onClick={decrease} className="px-3 py-2">−</button>
+              <span className="px-4 font-medium">{quantity}</span>
+              <button onClick={increase} className="px-3 py-2">+</button>
             </div>
 
-            <button className="w-full border-2 border-emerald-900 hover:bg-gray-200/90 text-black cursor-pointer mt-2 text-sm md:text-md p-2 rounded-lg">
-              Buy Now
+            <button
+              onClick={addToCartHandler}
+              disabled={selectedVariant.stock === 0}
+              className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg py-3 disabled:opacity-50"
+            >
+              Add to Cart
             </button>
           </div>
 
-          <div className="max-w-xl md:mt-10 ">
-            <div className="mt-2 md:mt-5">
-              <h1 className="text-xl font-bold ">About This Plant</h1>
-              <p className="p italic text-sm sm:text-md mt-1 md:mt-3">
-                {plant.description}
-              </p>
-            </div>
+         
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold">About this plant</h2>
+            <p className="text-gray-600 mt-2">
+              {plant.description}
+            </p>
           </div>
         </div>
       </div>
 
-      <hr className="text-gray-300" />
-
-      <div className="mt-4 md:mt-10">
+      
+      <div className="mt-12">
         <ReviewsSection productId={plant._id} />
-      </div>
-
-      <div className="mt-10 px-10 min-h-screen">
-        <h1 className="font-bold text-3xl">You may Also like</h1>
       </div>
     </div>
   );

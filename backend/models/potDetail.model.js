@@ -17,27 +17,10 @@ const potSchema = new mongoose.Schema({
         required: true,
         index: true
     },
-    color: {
-        type: String,
-        required: true,
-        index: true
-    },
-    diameter:{
-        type: String,
-        required: true
-    },
-    height:{
-        type:String,
-        required: true
-    },
     indoorOutdoor:{
         type : String,
         required: true,
         enum:["Indoor", "Outdoor", "Both"]
-    },
-    weight:{
-        type: String,
-        required: true,
     }
 });
 

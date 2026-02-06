@@ -84,28 +84,7 @@ const Pots = () => {
               </p>
             </div>
              
-            {/* <div className="flex items-center gap-1">
-              <label
-                htmlFor="sortBy"
-                className="text-sm md:text-xs font-medium text-gray-600"
-              >
-                Sort by
-              </label>
-
-              <select
-                id="sortBy"
-                name="sort"
-                className="bg-white border border-gray-300 
-               text-base md:text-sm 
-               text-gray-700 rounded-lg 
-               px-3 py-2
-               outline-none cursor-pointer"
-              >
-                <option value="name-asc">Name (A–Z)</option>
-                <option value="price-asc">Price (Low → High)</option>
-                <option value="price-desc">Price (High → Low)</option>
-              </select>
-            </div> */}
+            
           </div>
           <ProductSection
             products={pots}

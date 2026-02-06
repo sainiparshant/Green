@@ -4,6 +4,7 @@ import PlantSection from "../components/ProductSection";
 import { LayoutGrid } from "lucide-react";
 import API from "../api/axios";
 import { useSearchParams } from "react-router-dom";
+import MobileFilterBar from "../components/MobileFilterBar";
 
 const Plants = () => {
   
@@ -69,9 +70,16 @@ const Plants = () => {
           </div>
         </div>
       </div>
+      <div>
+        <MobileFilterBar
+  filters={filters}
+  setFilters={setFilters}
+  setPage={setPage}
+/>
 
+      </div>
       <div className="max-w-7xl mx-auto flex gap-6 md:px-4  md:px-4 py-5">
-        <aside className="hidden lg:block w-72 h-200 bg-white rounded-lg border border-gray-200 p-6">
+        <aside className="hidden lg:block bg-white rounded-lg border border-gray-200 p-6">
           <FilterSection
             filters={filters}
             setFilters={setFilters}
@@ -88,28 +96,6 @@ const Plants = () => {
               </p>
             </div>
              
-            {/* <div className="flex items-center gap-1">
-              <label
-                htmlFor="sortBy"
-                className="text-sm md:text-xs font-medium text-gray-600"
-              >
-                Sort by
-              </label>
-
-              <select
-                id="sortBy"
-                name="sort"
-                className="bg-white border border-gray-300 
-               text-base md:text-sm 
-               text-gray-700 rounded-lg 
-               px-3 py-2
-               outline-none cursor-pointer"
-              >
-                <option value="name-asc">Name (A–Z)</option>
-                <option value="price-asc">Price (Low → High)</option>
-                <option value="price-desc">Price (High → Low)</option>
-              </select>
-            </div> */}
           </div>
           <PlantSection
             products={plants}

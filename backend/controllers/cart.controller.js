@@ -4,20 +4,21 @@ import Product from "../models/product.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import Variant from "../models/variant.model.js";
 
 
 
 const addToCart = asyncHandler( async (req,res) => {
 
     const userId = req.user?._id;
-    const { quantity , productId }  = req.body;
+    const { quantity , productId, variantId }  = req.body;
 
     if(!userId){
         throw new ApiError(401, "Unauthorized");
     }
 
-    if(!quantity || !productId){
-        throw new ApiError(400, "Quantity and ProductId are required");
+    if(!quantity || !productId || !variantId){
+        throw new ApiError(400, "Quantity, ProductId and VariantId are required");
     }
 
     const qty = parseInt(quantity);
@@ -25,21 +26,31 @@ const addToCart = asyncHandler( async (req,res) => {
         throw new ApiError(400, "Quantity must be a positive number");
     }
 
-    if(!mongoose.isValidObjectId(productId)){
-        throw new ApiError(400, "Invalid ProductId");
+    if(!mongoose.isValidObjectId(productId) || !mongoose.isValidObjectId(variantId)){
+        throw new ApiError(400, "Invalid ProductId or VariantId");
     }
 
     const product = await Product.findOne({
         _id: productId,
-        available :true
-    });
+        available: true
+    }).select("_id");
+    
     if(!product){
         throw new ApiError(404, "Product not found or unavialable");
     }
 
-    if(qty > product.stock){
-        throw new ApiError(404, "Requested quantity not available in stock");
+    const variant = await Variant.findOne({
+        _id: variantId,
+        productId
+    });
+
+    if (!variant) {
+    throw new ApiError(404, "Variant not found for this product");
     }
+
+    if (qty > variant.stock) {
+    throw new ApiError(409, "Requested quantity exceeds available stock");
+  }
 
     let cart = await Cart.findOne({ user: userId  });
     if(!cart){
@@ -49,12 +60,12 @@ const addToCart = asyncHandler( async (req,res) => {
         });
     }
 
-    const existingItems = cart.items.find((i) =>  i.productId.toString() === productId);
+    const existingItems = cart.items.find((i) =>  i.variantId.toString() === variantId);
 
     if(existingItems){
 
         const newQty = existingItems.quantity + qty;
-        if(newQty > product.stock){
+        if(newQty > variant.stock){
             throw new ApiError(409, "quantity exceeds available stock")
         }
 
@@ -62,6 +73,7 @@ const addToCart = asyncHandler( async (req,res) => {
     }else{
         cart.items.push({
             productId,
+            variantId,
             quantity: qty
         })
     }
@@ -79,77 +91,96 @@ const addToCart = asyncHandler( async (req,res) => {
 
 });
 
-const quantityUpdate = asyncHandler( async(req,res) =>{
+const quantityUpdate = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  const { quantity, productId, variantId } = req.body;
 
-    const userId = req.user?._id;
-    const { quantity, productId } = req.body;
+  if (!userId) {
+    throw new ApiError(401, "Unauthorized Access");
+  }
 
-    if(!userId){
-        throw new ApiError(401, "Unauthorized Access");
-    }
+  if (quantity === undefined || !productId || !variantId) {
+    throw new ApiError(
+      400,
+      "Quantity, ProductID and VariantID are required"
+    );
+  }
 
-    if(!quantity || !productId) {
-        throw new ApiError(400, "Quantity and ProductIs  are required")
-    }
+  const qty = Number(quantity);
+  if (!Number.isInteger(qty) || qty < 1) {
+    throw new ApiError(400, "Quantity must be at least 1");
+  }
 
-    const qty = parseInt(quantity);
-    if(isNaN(qty) || qty < 1){
-        throw new ApiError(400, "Quantity must be atleast 1")
-    }
+  if ( !mongoose.Types.ObjectId.isValid(productId) || !mongoose.Types.ObjectId.isValid(variantId)) {
+    throw new ApiError(400, "Invalid ProductId or VariantId");
+  }
 
+  const cart = await Cart.findOne({ user: userId });
+  if (!cart) {
+    throw new ApiError(404, "Cart not found");
+  }
 
-    if(!mongoose.Types.ObjectId.isValid(productId)){
-        throw new ApiError(400, "Invalid productId")
-    }
+  const item = cart.items.find(
+    (i) =>
+      i.variantId.toString() === variantId &&
+      i.productId.toString() === productId
+  );
 
-    const cart = await Cart.findOne({user: userId});
-    if(!cart){
-        throw new ApiError(404, "Cart Not Found");
-    }
+  if (!item) {
+    throw new ApiError(404, "Item not found in cart");
+  }
 
-    const item = cart.items.find((i) => i.productId.toString() === productId);
-    if (!item) {
-    throw new ApiError(404, "Product not found in cart");
-    }
+  const product = await Product.findOne({
+    _id: productId,
+    available: true
+  }).select("_id");
 
-    const product = await Product.findById(productId);
-    if (!product || !product.available) {
+  if (!product) {
     throw new ApiError(404, "Product not available");
-    }
+  }
 
-    if(qty > product.stock){
-        throw new ApiError(409, "quanity excedding the stock")
-    }
+  const variant = await Variant.findOne({
+    _id: variantId,
+    productId
+  });
 
-    item.quantity = qty;
-    await cart.save();
+  if (!variant) {
+    throw new ApiError(404, "Variant not found for this product");
+  }
 
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            "cart updated successfully",
-            true,
-            cart
-        )
+  if (qty > variant.stock) {
+    throw new ApiError(409, "Quantity exceeds available stock");
+  }
+
+  item.quantity = qty;
+  await cart.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      "Cart updated successfully",
+      true,
+      cart
     )
-
+  );
 });
+
 
 const removeItem = asyncHandler( async(req,res) =>{
 
     const userId = req.user?._id;
-    const {productId} = req.body;
+    const {variantId} = req.body;
 
     if(!userId){
         throw new ApiError(409, "Unauthorized Access");
     }
 
-    if(!productId){
-        throw new ApiError(400, "ProductId also required");
+    if(!variantId){
+        throw new ApiError(400, "VariantId also required");
     }
 
-    if(!mongoose.Types.ObjectId.isValid(productId)){
-        throw new ApiError(400,"Invalid ProductId")
+    if(!mongoose.Types.ObjectId.isValid(variantId)){
+        throw new ApiError(400,"Invalid VariantId")
     }
 
     const cart = await Cart.findOne({user: userId});
@@ -157,13 +188,13 @@ const removeItem = asyncHandler( async(req,res) =>{
         throw new ApiError(404, "Cart not Found");
     }
 
-    const itemExist = cart.items.some((i) => i.productId.toString() === productId);
+    const itemExist = cart.items.some((i) => i.variantId.toString() === variantId);
     if(!itemExist){
         throw new ApiError(404, "Item not found")
     }
 
     cart.items = cart.items.filter( 
-        (item) => item.productId.toString() !== productId
+        (item) => item.variantId.toString() !== variantId
     );
 
     await cart.save();
@@ -189,11 +220,15 @@ const getCart = asyncHandler( async(req,res) =>{
     const cart = await Cart.findOne({user: userId})
         .populate({
             path:"items.productId",
-            select: "name price thumbnail stock available size title"
+            select: "name thumbnail title"
+        })
+        .populate({
+            path:"items.variantId",
+            select:"price stock available size"
         })
         .lean();
 
-
+    
     if(!cart){
         throw new ApiError(404, "Cart not Found");
     }
@@ -214,7 +249,7 @@ const getPriceSummary = asyncHandler( async(req,res) =>{
     const userId = req.user?._id;
 
     const cart = await Cart.findOne({user: userId})
-    .populate("items.productId")
+    .populate("items.variantId")
     .lean();
 
     if(!cart || cart.items.length === 0){
@@ -223,7 +258,7 @@ const getPriceSummary = asyncHandler( async(req,res) =>{
 
     let subtotal = 0;
     cart.items.forEach((item) => {
-        subtotal += item.productId.price * item.quantity;
+        subtotal += item.variantId.price * item.quantity;
     });
 
     const shipping = 60;

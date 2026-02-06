@@ -55,7 +55,7 @@ const PotDetails = () => {
   const fetchPotDetail = async () => {
   try {
     const { data } = await API.get(`/products/single-pot/${id}`);
-    setPot(data.data[0]);
+    setPot(data.data);
 
   } catch (error) {
     console.log(error.response?.data || error);
@@ -97,18 +97,14 @@ const PotDetails = () => {
         </div>
 
         <div>
-          <div className="flex gap-2">
-            <button className="bg-gray-200 p-1 text-xs rounded">{pot.size}</button>
-            <button className="bg-gray-200 p-1 text-xs rounded">{pot.potDetails.material}</button>
-          </div>
-
-          <div className="mt-1 md:mt-5 flex flex-col md:gap-2">
+          
+          <div className="flex flex-col md:gap-2">
             <h1 className="sm:text-4xl font-semibold text-2xl">{pot.name}</h1>
-            <p className="p italic">{pot.potDetails.category}</p>
+            <p className="p italic">{pot.potDetails.shape}</p>
 
             <div className="flex gap-2 items-center mt-1 md:mt-3">
-              <StarRating rating={5} />
-              <p className="p text-sm">(126 reviews)</p>
+              <StarRating rating={pot.avgRating} />
+              <p className="p text-sm">{pot.totalReview} (reviews)</p>
             </div>
 
             <div className="mt-1 md:mt-3">
