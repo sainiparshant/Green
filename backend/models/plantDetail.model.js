@@ -26,10 +26,6 @@ const plantSchema = new mongoose.Schema({
         required: true,
         enum:["Easy", "Medium", "Difficult"]
     },
-    height:{
-        type: Number,
-        required: true
-    },
     potIncluded:{
         type: Boolean,
         default: false

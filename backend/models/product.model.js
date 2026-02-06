@@ -12,10 +12,6 @@ const productSchema = new mongoose.Schema({
         type:String,
         required: true,
     },
-    price:{
-        type:Number,
-        required: true
-    },
     productType:{
         type: String,
         required: true,
@@ -47,20 +43,6 @@ const productSchema = new mongoose.Schema({
       }
     }
   ],
-    stock:{
-        type: Number,
-        required: true,
-        min: 0
-    },
-    size:{
-        type: String,
-        enum:["small", "medium", "large", "extra_Large"],
-        default:"small"
-    },
-    available:{
-        type: Boolean,
-        default: true
-    },
     avgRating: {
       type: Number,
       default: 0,

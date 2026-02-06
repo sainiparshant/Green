@@ -10,8 +10,9 @@ import Product from "../models/product.model.js";
 import Plant from "../models/plantDetail.model.js";
 import Order from "../models/order.model.js";
 import mongoose from "mongoose";
+import Variant from "../models/variant.model.js";
+import deleteImages from "../helper/imageDelete.js";
 
-// admin dashboard
 const changePassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   if (!oldPassword || !newPassword) {
@@ -67,20 +68,24 @@ const addPhoto = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Image uploaded", true, user));
 });
 
-
-// Product Controller
 const addProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, stock, size, title, productType } =
-    req.body;
-
-  let { details } = req.body;
+  const { name, description, title, productType } = req.body;
+  let { variants, details } = req.body;
 
   if (typeof details === "string") {
     details = JSON.parse(details);
   }
 
-  if (!name || !price || !description || !stock || !title || !productType) {
+  if (typeof variants === "string") {
+    variants = JSON.parse(variants);
+  }
+
+  if (!name || !description || !title || !productType) {
     throw new ApiError(400, "All fields are required");
+  }
+
+  if (!Array.isArray(variants) || variants.length === 0) {
+    throw new ApiError(400, "At least one variant is required");
   }
 
   if (!req.files || !req.files.images || req.files.images.length === 0) {
@@ -93,30 +98,77 @@ const addProduct = asyncHandler(async (req, res) => {
     imageId: img.fileId,
   }));
 
-  const product = await Product.create({
-    name,
-    price,
-    description,
-    stock,
-    thumbnail: images[0],
-    images,
-    size,
-    title,
-    productType,
-  });
+  const imageIds = images.map((img) => img.imageId);
+  const thumbnail = images[0];
 
-  if (productType === "Plant") {
-    await Plant.create({
-      productId: product._id,
-      ...details,
-    });
-  }
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (productType === "Pot") {
-    await Pot.create({
-      productId: product._id,
-      ...details,
-    });
+  let product;
+
+  try {
+    const newProduct = await Product.create(
+      [
+        {
+          name,
+          description,
+          thumbnail,
+          images,
+          title,
+          productType,
+        },
+      ],
+      { session },
+    );
+
+    product  = newProduct[0];
+    const productId = product._id;
+
+    const variantsData = variants.map((v) => ({
+      productId,
+      size: v.size,
+      price: v.price,
+      stock: v.stock,
+      color: v.color,
+      height: v.height,
+      width: v.width,
+      diameter: v.diameter,
+    }));
+
+    await Variant.insertMany(variantsData, { session });
+
+    if (productType === "Plant") {
+      await Plant.create(
+        [
+          {
+            productId,
+            ...details,
+          },
+        ],
+        { session },
+      );
+    }
+
+    if (productType === "Pot") {
+      await Pot.create(
+        [
+          {
+            productId,
+            ...details,
+          },
+        ],
+        { session },
+      );
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    await deleteImages(imageIds);
+    throw error;
   }
 
   return res
@@ -277,16 +329,14 @@ const dashboardData = asyncHandler(async (req, res) => {
   const totalProduct = await Product.countDocuments();
   const totalCustomer = await User.countDocuments();
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, "data fetched", true, {
-        stat,
-        recentOrders,
-        totalProduct,
-        totalCustomer,
-      }),
-    );
+  return res.status(200).json(
+    new ApiResponse(200, "data fetched", true, {
+      stat,
+      recentOrders,
+      totalProduct,
+      totalCustomer,
+    }),
+  );
 });
 
 const toggleProduct = asyncHandler(async (req, res) => {
@@ -324,10 +374,10 @@ const orderDetail = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
 
   const order = await Order.aggregate([
-    { 
-        $match:{
-             _id: new mongoose.Types.ObjectId(orderId)
-        }
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(orderId),
+      },
     },
     {
       $lookup: {
@@ -344,7 +394,7 @@ const orderDetail = asyncHandler(async (req, res) => {
         orderNumber: 1,
         createdAt: 1,
         paymentStatus: 1,
-        paymentMethod:1,
+        paymentMethod: 1,
         orderStatus: 1,
         items: { name: 1, quantity: 1, price: 1 },
         totalAmount: 1,
@@ -354,7 +404,7 @@ const orderDetail = asyncHandler(async (req, res) => {
           phone: 1,
         },
       },
-    }
+    },
   ]);
 
   return res
@@ -362,74 +412,77 @@ const orderDetail = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Order detail fetched", true, order));
 });
 
-const updateOrderStatus = asyncHandler( async(req,res) =>{
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
 
-    const {orderId} = req.params;
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
+    throw new ApiError(401, "Invalid orderId");
+  }
 
-    if(!mongoose.Types.ObjectId.isValid(orderId)){
-        throw new ApiError(401, "Invalid orderId")
-    }
+  const { orderStatus } = req.body;
 
-    const {orderStatus} = req.body;
+  const order = await Order.findByIdAndUpdate(
+    orderId,
+    { orderStatus },
+    { new: true },
+  ).select("orderStatus orderNumber totalAmount");
 
-    const order = await Order.findByIdAndUpdate(orderId, {orderStatus}, {new: true}).select("orderStatus orderNumber totalAmount");
+  if (!order) {
+    throw new ApiError(404, "No order found");
+  }
 
-    if(!order){
-        throw new ApiError(404, "No order found")
-    }
-
-    return res
+  return res
     .status(200)
     .json(new ApiResponse(200, "Order status updated", true, order));
 });
 
-const customers = asyncHandler(async(req,res) =>{
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 15;
+const customers = asyncHandler(async (req, res) => {
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 15;
 
-    const {search} = req.query;
-    let query={
-        role:"user"
-    };
+  const { search } = req.query;
+  let query = {
+    role: "user",
+  };
 
-    if(search){
-        query.$or = [
-            { name: { $regex: search, $options: "i" }},
-            {email:{ $regex: search, $options: "i"}}
-        ]
-    }
-
-    const pipeline = [
-        { $match: query },
-        {
-            $lookup:{
-                from: "orders",
-                localField: "_id",
-                foreignField: "user",
-                as: "orders"
-            }
-        },
-        {
-            $project:{
-                _id: 1,
-                name: 1,
-                email: 1,
-                phone: 1,
-                ordersCount: {$size: "$orders"}
-            }
-        }
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
     ];
+  }
 
-    const options={
-        page,
-        limit
-    }
+  const pipeline = [
+    { $match: query },
+    {
+      $lookup: {
+        from: "orders",
+        localField: "_id",
+        foreignField: "user",
+        as: "orders",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        email: 1,
+        phone: 1,
+        ordersCount: { $size: "$orders" },
+      },
+    },
+  ];
 
-    const customers = await User.aggregatePaginate(pipeline, options);
+  const options = {
+    page,
+    limit,
+  };
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, "Customers fetched", true, customers));
+  const customers = await User.aggregatePaginate(pipeline, options);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Customers fetched", true, customers));
 });
 
 export {
@@ -444,5 +497,5 @@ export {
   deleteProduct,
   orderDetail,
   updateOrderStatus,
-  customers
+  customers,
 };

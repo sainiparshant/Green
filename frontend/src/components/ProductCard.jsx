@@ -44,7 +44,7 @@ const ProductCard = ({ product }) => {
 
   if (isHomePage) {
     if (product.productType === "Plant") {
-      productInfo = product.plantDetails.category;
+      productInfo = product.category;
     } else if (product.productType === "Pot") {
       productInfo = product.potDetails.shape;
     }

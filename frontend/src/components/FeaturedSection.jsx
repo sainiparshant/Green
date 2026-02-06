@@ -12,8 +12,9 @@ const FeaturedSection = () => {
   const AllPlants = async () => {
     try {
       const { data } = await API.get(
-        "/products/all/plants?featured=true&available=true&limit=8",
+        "/products/all/plants?",
       );
+      console.log(data.data);
       setPlants(data.data.docs);
     } catch (error) {
       toast.error("Server Error");
@@ -51,12 +52,12 @@ const FeaturedSection = () => {
           <ProductCard
             key={plant._id}
             product={plant}
-            productInfo={plant.plantDetails.category}
+            productInfo={plant.category}
           />
         ))}
       </div>
 
-      {/* View All Button */}
+     
       <div className="text-center mt-8">
         <Link to="/plants">
           <button className="border-2 border-emerald-600 text-emerald-600 px-8 py-2 rounded-lg font-semibold hover:bg-emerald-600 hover:text-white transition-colors">

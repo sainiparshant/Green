@@ -34,86 +34,107 @@ const globalSearch = asyncHandler( async (req,res) =>{
 
 });
 
-//plant controller
 
-const getAllPlants = asyncHandler( async(req,res) =>{
+const getAllPlants = asyncHandler(async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
 
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+  const { search, available, category, size, price } = req.query;
 
-    const { search, available, category ,size, price} = req.query;
+  const productMatch = { productType: "Plant" };
 
-    let query= {};
-    let productMatch = { productType: "Plant" };
+  if (search) {
+    productMatch.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } }
+    ];
+  }
 
-    if(search){
-       productMatch.$or = [
-            { name: { $regex: search, $options: "i" } },
-            { title: { $regex: search, $options: "i" }},
-            { description: { $regex: search, $options: "i"}}
-       ]
-    }
+  if (available !== undefined) {
+    productMatch.available = available === "true";
+  }
 
-    if(available){
-        productMatch.available = available === "true";
-    }
+ const pipeline = [
+  { $match: productMatch },
 
-    
-    if(size){
-        productMatch.size = size;
-    }
-
-    if(price){
-        productMatch.price = { $lte: Number(price) }
-    }
-
-
-    if(category){
-        query["plantDetails.category"] = {
-            $regex: category,
-            $options: "i"
-        };
-    }
-
-    const pipeline = [
-
-        { $match: productMatch },
+  {
+    $lookup: {
+      from: "plants",
+      let: { productId: "$_id" },
+      pipeline: [
         {
-            $lookup: {
-                from: "plants",
-                localField:"_id",
-                foreignField:"productId",
-                as: "plantDetails"
-            }
+          $match: {
+            $expr: { $eq: ["$productId", "$$productId"] }
+          }
         },
-
-        { $unwind: "$plantDetails"},
-
-        {$match: query},
-
-        { $sort: {createdAt: -1}}
-    ]
-
-    
-    const options = {
-        page,
-        limit
+        ...(category
+          ? [{ $match: { category: { $regex: category, $options: "i" } } }]
+          : [])
+      ],
+      as: "plantDetails"
     }
+  },
 
-    const result = await Product.aggregatePaginate(pipeline, options); 
+  { $unwind: "$plantDetails" },
 
-    return res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            "All plants fetched successfully",
-            true,
-            result
-        )
+  {
+    $lookup: {
+      from: "variants",
+      let: { productId: "$_id" },
+      pipeline: [
+        {
+          $match: {
+            $expr: { $eq: ["$productId", "$$productId"] }
+          }
+        },
+        ...(size ? [{ $match: { size } }] : []),
+        ...(price
+          ? [{ $match: { price: { $lte: Number(price) } } }]
+          : [])
+      ],
+      as: "variants"
+    }
+  },
+
+  { $match: { variants: { $ne: [] } } },
+
+  {
+    $addFields: {
+      minPrice: { $min: "$variants.price" }
+    }
+  },
+
+  {
+    $project: {
+      name: 1,
+      thumbnail: 1,
+      createdAt: 1,
+      productType: 1,
+      category: "$plantDetails.category",
+      price: "$minPrice"
+    }
+  },
+
+  { $sort: { createdAt: -1 } }
+];
+
+
+  const result = await Product.aggregatePaginate(pipeline, {
+    page,
+    limit
+  });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      "All plants fetched successfully",
+      true,
+      result
     )
-    
+  );
 });
+
 
 const getSinglePlant = asyncHandler( async (req,res) =>{
 
