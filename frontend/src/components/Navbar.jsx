@@ -122,7 +122,7 @@ const Navbar = () => {
     <>
       {/* Main Navbar */}
       <nav 
-        className={`w-full sticky top-0 z-50 transition-all duration-300 ${
+        className={`w-full md:sticky top-0 z-50 transition-all duration-300 ${
           isScrolled 
             ? 'bg-white shadow-md py-3' 
             : 'bg-gray-200/50 py-4'
