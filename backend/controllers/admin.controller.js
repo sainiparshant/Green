@@ -194,9 +194,20 @@ const getProducts = asyncHandler(async (req, res) => {
   if (available) query.available = available === "true";
   if (isFeatured) query.isFeatured = isFeatured === "true";
   if (productType) query.productType = productType;
-  if (size) query.size = size;
 
-  const pipeline = [{ $match: query }, { $sort: { createdAt: -1 } }];
+
+  const pipeline = [
+    { $match: query },
+    {
+      $lookup:{
+        from:"variants",
+        localField:"_id",
+        foreignField:"productId",
+        as:"variantsDetail"
+      }
+    },
+    { $sort: { createdAt: -1 } }
+  ];
 
   const options = {
     page,

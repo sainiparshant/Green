@@ -19,7 +19,7 @@ const ProductPage = () => {
 
   const allProducts = async () => {
     try {
-      const {data} = await API.get(
+      const { data } = await API.get(
         `/admin/products`,{
           params:{
             ...filters,
@@ -27,6 +27,7 @@ const ProductPage = () => {
           }
         }
       );
+      console.log(data.data);
       setProducts(data.data.docs);
       setTotalPages(data.data.totalPages);
     } catch (error) {

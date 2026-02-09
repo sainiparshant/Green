@@ -13,13 +13,16 @@ const ProductSection = ({ products, loading, totalPages, page, setPage }) => {
 
   return (
     <div className="py-2 px-2">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 ">
-        {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
-      </div>
+      <div className="min-h-[100vh]">
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+    {products.map((product) => (
+      <ProductCard key={product._id} product={product} />
+    ))}
+  </div>
+</div>
 
-      <div className="flex justify-center items-center gap-2 mt-16">
+
+      <div className="flex justify-center items-center gap-2 mt-16 ">
         <button
           onClick={() => setPage(page - 1)}
           disabled={page === 1}

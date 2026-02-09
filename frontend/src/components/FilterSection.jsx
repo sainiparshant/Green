@@ -77,11 +77,11 @@ const FilterSection = ({ filters, setFilters, setPage, isMobile = false }) => {
     filters.price !== 2000;
 
   return (
-    <div className={isMobile ? "max-h-[70vh] overflow-y-auto" : "h-fit max-h-[calc(100vh-200px)] overflow-y-auto lg:pr-2"}>
+    <div className={isMobile ? "max-h-[100vh] overflow-y-auto" : "h-fit min-h-[100vh]  lg:pr-2"}>
       {/* Header with Clear All - Only show on desktop */}
       {!isMobile && (
         <>
-          <div className="flex items-center justify-between mb-4 sticky top-0 bg-white pb-2 z-10">
+          <div className="flex items-center justify-between mb-4 sticky top-0 pb-2 z-10">
             <h1 className="text-base md:text-lg font-semibold">Filters</h1>
             {hasActiveFilters && (
               <button
@@ -114,8 +114,8 @@ const FilterSection = ({ filters, setFilters, setPage, isMobile = false }) => {
       )}
 
       {/* Category Filter */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between mb-3">
+      <div className="mb-1">
+        <div className="flex items-center justify-between mb-1">
           <h2 className="text-sm font-semibold">
             Category
             {categoryArray.length > 0 && (
@@ -134,11 +134,11 @@ const FilterSection = ({ filters, setFilters, setPage, isMobile = false }) => {
           )}
         </div>
 
-        <div className="space-y-2">
+        <div className="">
           {["Outdoor", "Indoor", "Flower", "Medicinal", "Bonsai", "Herbal", "Succulent"].map(cat => (
             <label
               key={cat}
-              className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-3 cursor-pointer p-1 rounded-lg transition-colors ${
                 categoryArray.includes(cat)
                   ? "bg-emerald-50 text-emerald-700"
                   : "hover:bg-gray-50"
@@ -160,7 +160,7 @@ const FilterSection = ({ filters, setFilters, setPage, isMobile = false }) => {
 
       {/* Price Range Filter */}
       <div className="mb-5">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-1">
           <h2 className="text-sm font-semibold">Price Range</h2>
           {filters.price !== 2000 && (
             <button
@@ -172,7 +172,7 @@ const FilterSection = ({ filters, setFilters, setPage, isMobile = false }) => {
           )}
         </div>
 
-        <div className="space-y-3">
+        <div className="">
           <input
             type="range"
             id="price"
@@ -196,7 +196,7 @@ const FilterSection = ({ filters, setFilters, setPage, isMobile = false }) => {
       <hr className="text-gray-400 mb-4" />
 
       {/* Size Filter */}
-      <div className="mb-5">
+      <div className="mb-3">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold">
             Size
@@ -216,11 +216,11 @@ const FilterSection = ({ filters, setFilters, setPage, isMobile = false }) => {
           )}
         </div>
 
-        <div className="space-y-2">
+        <div className="">
           {["small", "medium", "large"].map(size => (
             <label
               key={size}
-              className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors capitalize ${
+              className={`flex items-center gap-3 cursor-pointer p-1 rounded-lg transition-colors capitalize ${
                 sizeArray.includes(size)
                   ? "bg-emerald-50 text-emerald-700"
                   : "hover:bg-gray-50"

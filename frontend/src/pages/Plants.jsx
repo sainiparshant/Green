@@ -50,7 +50,7 @@ const Plants = () => {
         params: {
           ...apiFilters,
           page,
-          limit: 12,
+          limit: 15,
         },
       });
 
@@ -84,7 +84,7 @@ const Plants = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100/30">
+    <div className=" bg-gray-100/30">
       <div className="relative w-full h-[20vh] md:h-[40vh] shadow-2xl">
         <img
           src="/hero_photo.jpg"
@@ -110,7 +110,7 @@ const Plants = () => {
 
       <div className="max-w-7xl mx-auto flex gap-6 px-4 py-5">
         {/* Desktop Filter Sidebar */}
-        <aside className="hidden lg:block w-64 xl:w-72 bg-white rounded-lg border border-gray-200 p-4 xl:p-5 sticky top-20 self-start">
+        <aside className="hidden lg:block w-64 xl:w-72 bg-white rounded-lg border border-gray-200 p-4 xl:p-5  top-20 self-start">
           <FilterSection
             filters={filters}
             setFilters={setFilters}

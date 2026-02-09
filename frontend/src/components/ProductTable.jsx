@@ -1,142 +1,149 @@
-import { useState, useEffect } from "react";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
-import API from "../api/axios";
-import { toast } from "react-toastify";
+import { useState } from "react";
 
-const ProductTable = ({ products, onDelete }) => {
-  const [openMenu, setOpenMenu] = useState(null);
-  const [rows, setRows] = useState([]);
-
-  useEffect(() => {
-    setRows(products);
-  }, [products]);
-
-  const handleToggle = async (id, field) => {
-    setRows((prev) =>
-      prev.map((item) =>
-        item._id === id ? { ...item, [field]: !item[field] } : item
-      )
-    );
-
-    try {
-      await API.patch(`/admin/toggle/${id}`, { field });
-      toast.success("Availability updated");
-    } catch (error) {
-      setRows((prev) =>
-        prev.map((item) =>
-          item._id === id ? { ...item, [field]: !item[field] } : item
-        )
-      );
-      toast.error("Update failed");
-    }
-  };
+const AdminProductTable = ({ products }) => {
+  const [openProduct, setOpenProduct] = useState(null);
 
   return (
-    <div className="bg-white rounded-xl border overflow-hidden">
-      <table className="w-full text-sm text-left">
+    <div className="overflow-x-auto bg-white rounded-xl border">
+      <table className="min-w-full text-sm">
         <thead className="bg-gray-50 border-b">
-          <tr className="text-gray-600">
-            <th className="px-6 py-4 font-semibold">Product</th>
-            <th className="px-6 py-4 font-semibold">Type</th>
-            <th className="px-6 py-4 font-semibold">Price</th>
-            <th className="px-6 py-4 font-semibold">Stock</th>
-            <th className="px-6 py-4 font-semibold">Size</th>
-            <th className="px-6 py-4 font-semibold text-center">Available</th>
-            <th className="px-6 py-4 font-semibold text-right">Actions</th>
+          <tr className="text-left text-gray-600 font-medium">
+            <th className="px-4 py-3">Product</th>
+            <th className="px-4 py-3">Type</th>
+            <th className="px-4 py-3">Available</th>
+            <th className="px-4 py-3">Featured</th>
+            <th className="px-4 py-3">Variants</th>
+            <th className="px-4 py-3">Total Stock</th>
+            <th className="px-4 py-3">Actions</th>
           </tr>
         </thead>
 
         <tbody className="divide-y">
-          {rows.map((product) => (
-            <tr
-              key={product._id}
-              className="hover:bg-gray-50 transition"
-            >
-              <td className="px-6 py-4">
-                <p className="font-medium text-gray-900">
-                  {product.name}
-                </p>
-              </td>
+          {products.map((product) => {
+            const totalStock = product.variantsDetail.reduce(
+              (sum, v) => sum + v.stock,
+              0
+            );
 
-              <td className="px-6 py-4 text-gray-600">
-                {product.productType}
-              </td>
-
-              <td className="px-6 py-4 font-medium">
-                ₹{product.price}
-              </td>
-
-              <td className="px-6 py-4">
-                {product.stock > 0 ? (
-                  <span className="text-gray-700">
-                    {product.stock}
-                  </span>
-                ) : (
-                  <span className="text-red-600 font-medium">
-                    Out of stock
-                  </span>
-                )}
-              </td>
-
-              <td className="px-6 py-4 text-gray-600">
-                {product.size}
-              </td>
-
-              <td className="px-6 py-4 text-center">
-                <StatusToggle
-                  active={product.available}
+            return (
+              <>
+                <tr
+                  key={product._id}
+                  className="hover:bg-gray-50 cursor-pointer"
                   onClick={() =>
-                    handleToggle(product._id, "available")
+                    setOpenProduct(
+                      openProduct === product._id ? null : product._id
+                    )
                   }
-                />
-              </td>
-
-              <td className="px-6 py-4 text-right relative">
-                <button
-                  onClick={() =>
-                    setOpenMenu(openMenu === product._id ? null : product._id)
-                  }
-                  className="p-2 rounded-md hover:bg-gray-100"
                 >
-                  <MoreVertical size={16} />
-                </button>
+                  <td className="px-4 py-3 font-medium text-gray-900">
+                    {product.name}
+                  </td>
 
-                {openMenu === product._id && (
-                  <div className="absolute right-6 top-12 w-32 bg-white border rounded-lg shadow-lg z-10">
-                    <button className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-gray-50">
-                      <Pencil size={14} /> Edit
-                    </button>
-                    <button
-                      onClick={() => onDelete(product._id)}
-                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                  <td className="px-4 py-3">
+                    {product.productType}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        product.available
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
                     >
-                      <Trash2 size={14} /> Delete
-                    </button>
-                  </div>
+                      {product.available ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {product.isFeatured ? "Yes" : "No"}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {product.variantsDetail.length}
+                  </td>
+
+                  <td className="px-4 py-3 font-medium">
+                    {totalStock}
+                  </td>
+
+                  <td className="px-4 py-3 text-emerald-600 text-sm">
+                    {openProduct === product._id ? "Hide" : "View"}
+                  </td>
+                </tr>
+
+                {openProduct === product._id && (
+                  <tr>
+                    <td colSpan="7" className="bg-gray-50 px-4 py-4">
+                      <table className="w-full text-sm border rounded-lg bg-white">
+                        <thead className="bg-gray-100 border-b">
+                          <tr className="text-gray-600">
+                            <th className="px-3 py-2">Size</th>
+                            <th className="px-3 py-2">Color</th>
+                            <th className="px-3 py-2">Price</th>
+                            <th className="px-3 py-2">Stock</th>
+                            <th className="px-3 py-2">Status</th>
+                            <th className="px-3 py-2">Actions</th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          {product.variantsDetail.map((variant) => (
+                            <tr
+                              key={variant._id}
+                              className="border-t hover:bg-gray-50"
+                            >
+                              <td className="px-3 py-2">
+                                {variant.size || "-"}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                {variant.color || "-"}
+                              </td>
+
+                              <td className="px-3 py-2 font-medium">
+                                ₹{variant.price}
+                              </td>
+
+                              <td
+                                className={`px-3 py-2 font-medium ${
+                                  variant.stock < 5
+                                    ? "text-red-600"
+                                    : "text-gray-900"
+                                }`}
+                              >
+                                {variant.stock}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                {variant.stock > 0
+                                  ? "In Stock"
+                                  : "Out of Stock"}
+                              </td>
+
+                              <td className="px-3 py-2">
+                                <button className="text-sm text-blue-600 hover:underline mr-3">
+                                  Edit
+                                </button>
+                                <button className="text-sm text-red-600 hover:underline">
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
                 )}
-              </td>
-            </tr>
-          ))}
+              </>
+            );
+          })}
         </tbody>
       </table>
     </div>
   );
 };
 
-const StatusToggle = ({ active, onClick }) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-3 py-1 rounded-full text-xs font-semibold transition
-        ${
-          active
-            ? "bg-emerald-100 text-emerald-700"
-            : "bg-gray-200 text-gray-600"
-        }`}
-    >
-      {active ? "Available" : "Unavailable"}
-    </button>
-  );
-};
-
-export default ProductTable;
+export default AdminProductTable;

@@ -336,7 +336,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Back to Top Button - Bottom Right */}
+      
       <button
         onClick={scrollToTop}
         className="absolute bottom-14 right-4 md:bottom-8 md:right-8 w-9 h-9 md:w-12 md:h-12 rounded-full bg-emerald-500 hover:bg-emerald-600 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 z-20 group"
