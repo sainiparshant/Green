@@ -1,42 +1,86 @@
 import React from "react";
 import { X } from "lucide-react";
 
-const FilterSection = ({ filters, setFilters, setPage }) => {
-  const handleChange = (field, value) => {
-    setFilters((prev) => ({
+const FilterSection = ({ filters, setFilters, setPage, isMobile = false }) => {
+
+  const handleCategoryChange = (category) => {
+    setFilters(prev => {
+      const currentCategories = Array.isArray(prev.category) 
+        ? prev.category 
+        : prev.category ? [prev.category] : [];
+      const isSelected = currentCategories.includes(category);
+      
+      return {
+        ...prev,
+        category: isSelected
+          ? currentCategories.filter(cat => cat !== category)
+          : [...currentCategories, category]
+      };
+    });
+    setPage(1);
+  };
+
+  const handleSizeChange = (size) => {
+    setFilters(prev => {
+      const currentSizes = Array.isArray(prev.size) 
+        ? prev.size 
+        : prev.size ? [prev.size] : [];
+      const isSelected = currentSizes.includes(size);
+      
+      return {
+        ...prev,
+        size: isSelected
+          ? currentSizes.filter(s => s !== size)
+          : [...currentSizes, size]
+      };
+    });
+    setPage(1);
+  };
+
+  const handlePriceChange = (value) => {
+    setFilters(prev => ({
       ...prev,
-      [field]: value,
+      price: value
     }));
     setPage(1);
   };
 
   const clearFilter = (field) => {
-    setFilters((prev) => ({
+    setFilters(prev => ({
       ...prev,
-      [field]: field === "price" ? 2000 : "",
+      [field]: field === "price" ? 2000 : []
     }));
     setPage(1);
   };
 
   const clearAllFilters = () => {
     setFilters({
-      category: "",
+      category: [],
       price: 2000,
-      size: "",
+      size: [],
     });
     setPage(1);
   };
 
-  const hasActiveFilters =
-    filters.category !== "" ||
-    filters.size !== "" ||
+  // Normalize filters to arrays for display
+  const categoryArray = Array.isArray(filters.category) 
+    ? filters.category 
+    : filters.category ? [filters.category] : [];
+  
+  const sizeArray = Array.isArray(filters.size) 
+    ? filters.size 
+    : filters.size ? [filters.size] : [];
+
+  const hasActiveFilters = 
+    categoryArray.length > 0 || 
+    sizeArray.length > 0 || 
     filters.price !== 2000;
 
   return (
-    <div className="h-[calc(100vh)]  pr-2">
-      
-      <div className="flex items-center justify-between mb-4 sticky top-0 bg-white pb-2 z-10">
-        <h1 className="text-lg font-semibold">Filters</h1>
+    <div className={isMobile ? "max-h-[70vh] overflow-y-auto" : "h-fit max-h-[calc(100vh-200px)] overflow-y-auto pr-2"}>
+      {/* Header with Clear All */}
+      <div className={`flex items-center justify-between mb-4 ${!isMobile && 'sticky top-0 bg-white pb-2 z-10'}`}>
+        <h1 className="text-base md:text-lg font-semibold">Filters</h1>
         {hasActiveFilters && (
           <button
             onClick={clearAllFilters}
@@ -47,14 +91,20 @@ const FilterSection = ({ filters, setFilters, setPage }) => {
           </button>
         )}
       </div>
+      <hr className="text-gray-400 mb-4" />
 
-      <hr className="text-gray-300 mb-4" />
-
-      {/* Category */}
+      {/* Category Filter */}
       <div className="mb-5">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold">Category</h2>
-          {filters.category && (
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold">
+            Category
+            {categoryArray.length > 0 && (
+              <span className="ml-2 text-xs text-emerald-600 font-normal">
+                ({categoryArray.length})
+              </span>
+            )}
+          </h2>
+          {categoryArray.length > 0 && (
             <button
               onClick={() => clearFilter("category")}
               className="text-xs text-gray-500 hover:text-emerald-600"
@@ -64,43 +114,33 @@ const FilterSection = ({ filters, setFilters, setPage }) => {
           )}
         </div>
 
-        {[
-          "Outdoor",
-          "Indoor",
-          "Flower",
-          "Medicinal",
-          "Bonsai",
-          "Herbal",
-          "Succulent",
-        ].map((cat) => (
-          <label
-            key={cat}
-            className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors ${
-              filters.category === cat
-                ? "bg-emerald-50 text-emerald-700"
-                : "hover:bg-gray-50"
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={filters.category === cat}
-              onChange={(e) =>
-                e.target.checked
-                  ? handleChange("category", cat)
-                  : clearFilter("category")
-              }
-              className="w-4 h-4 text-emerald-600 rounded"
-            />
-            <span className="text-sm">{cat}</span>
-          </label>
-        ))}
+        <div className="space-y-2">
+          {["Outdoor", "Indoor", "Flower", "Medicinal", "Bonsai", "Herbal", "Succulent"].map(cat => (
+            <label
+              key={cat}
+              className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors ${
+                categoryArray.includes(cat)
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "hover:bg-gray-50"
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                checked={categoryArray.includes(cat)}
+                onChange={() => handleCategoryChange(cat)}
+              />
+              <span className="text-sm">{cat}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
-      <hr className="text-gray-300 mb-4" />
+      <hr className="text-gray-400 mb-4" />
 
-      {/* Price */}
+      {/* Price Range Filter */}
       <div className="mb-5">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold">Price Range</h2>
           {filters.price !== 2000 && (
             <button
@@ -112,34 +152,41 @@ const FilterSection = ({ filters, setFilters, setPage }) => {
           )}
         </div>
 
-        <input
-          type="range"
-          min={100}
-          max={2000}
-          step={50}
-          value={filters.price}
-          onChange={(e) =>
-            handleChange("price", Number(e.target.value))
-          }
-          className="w-full accent-emerald-600"
-        />
-
-        <div className="flex justify-between text-xs text-gray-600 mt-1">
-          <span>₹100</span>
-          <span className="font-semibold text-emerald-600">
-            Up to ₹{filters.price}
-          </span>
-          <span>₹2000</span>
+        <div className="space-y-3">
+          <input
+            type="range"
+            id="price"
+            min={100}
+            max={2000}
+            step={50}
+            value={filters.price}
+            onChange={e => handlePriceChange(Number(e.target.value))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+          />
+          <div className="flex items-center justify-between text-xs text-gray-600">
+            <span>₹100</span>
+            <span className="font-semibold text-emerald-600 text-sm">
+              Up to ₹{filters.price}
+            </span>
+            <span>₹2000</span>
+          </div>
         </div>
       </div>
 
-      <hr className="text-gray-300 mb-4" />
+      <hr className="text-gray-400 mb-4" />
 
-      {/* Size */}
+      {/* Size Filter */}
       <div className="mb-5">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold">Size</h2>
-          {filters.size && (
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold">
+            Size
+            {sizeArray.length > 0 && (
+              <span className="ml-2 text-xs text-emerald-600 font-normal">
+                ({sizeArray.length})
+              </span>
+            )}
+          </h2>
+          {sizeArray.length > 0 && (
             <button
               onClick={() => clearFilter("size")}
               className="text-xs text-gray-500 hover:text-emerald-600"
@@ -149,29 +196,72 @@ const FilterSection = ({ filters, setFilters, setPage }) => {
           )}
         </div>
 
-        {["small", "medium", "large"].map((size) => (
-          <label
-            key={size}
-            className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors capitalize ${
-              filters.size === size
-                ? "bg-emerald-50 text-emerald-700"
-                : "hover:bg-gray-50"
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={filters.size === size}
-              onChange={(e) =>
-                e.target.checked
-                  ? handleChange("size", size)
-                  : clearFilter("size")
-              }
-              className="w-4 h-4 text-emerald-600 rounded"
-            />
-            <span className="text-sm">{size}</span>
-          </label>
-        ))}
+        <div className="space-y-2">
+          {["small", "medium", "large"].map(size => (
+            <label
+              key={size}
+              className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors capitalize ${
+                sizeArray.includes(size)
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "hover:bg-gray-50"
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                checked={sizeArray.includes(size)}
+                onChange={() => handleSizeChange(size)}
+              />
+              <span className="text-sm">{size}</span>
+            </label>
+          ))}
+        </div>
       </div>
+
+      {/* Active Filters Summary */}
+      {hasActiveFilters && (
+        <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+          <p className="text-xs font-semibold text-emerald-700 mb-2">Active Filters:</p>
+          <div className="flex flex-wrap gap-2">
+            {categoryArray.map(cat => (
+              <span 
+                key={cat}
+                className="inline-flex items-center gap-1 bg-white px-2 py-1 rounded text-xs border border-emerald-200"
+              >
+                {cat}
+                <X
+                  size={12}
+                  className="cursor-pointer hover:text-red-500"
+                  onClick={() => handleCategoryChange(cat)}
+                />
+              </span>
+            ))}
+            {sizeArray.map(size => (
+              <span 
+                key={size}
+                className="inline-flex items-center gap-1 bg-white px-2 py-1 rounded text-xs capitalize border border-emerald-200"
+              >
+                {size}
+                <X
+                  size={12}
+                  className="cursor-pointer hover:text-red-500"
+                  onClick={() => handleSizeChange(size)}
+                />
+              </span>
+            ))}
+            {filters.price !== 2000 && (
+              <span className="inline-flex items-center gap-1 bg-white px-2 py-1 rounded text-xs border border-emerald-200">
+                Up to ₹{filters.price}
+                <X
+                  size={12}
+                  className="cursor-pointer hover:text-red-500"
+                  onClick={() => clearFilter("price")}
+                />
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
