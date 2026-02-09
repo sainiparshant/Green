@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 const ProductCard = ({ product }) => {
   const location = useLocation();
@@ -49,13 +50,29 @@ const ProductCard = ({ product }) => {
             ₹{product.price}
           </span>
 
-          <button
+          {/* <button
             className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 
              text-sm md:text-base font-semibold text-white 
              hover:bg-emerald-700 transition-all"
           >
             View
             <span className="text-lg leading-none">→</span>
+          </button> */}
+
+          <button
+            className="flex items-center justify-center gap-1 md:gap-2 
+                       rounded-lg md:rounded-xl 
+                       bg-emerald-600 
+                       px-3 py-2 md:px-5 md:py-2.5
+                       text-xs md:text-sm font-semibold text-white 
+                       hover:bg-emerald-700 
+                       active:scale-95
+                       transition-all duration-200
+                       shadow-md hover:shadow-lg
+                       group-hover:translate-x-1"
+          >
+            View
+            <ArrowRight className="w-3 h-3 md:w-4 md:h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
       </div>
