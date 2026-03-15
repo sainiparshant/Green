@@ -279,24 +279,23 @@ const getOrders = asyncHandler(async (req, res) => {
 });
 
 const getMonthlyRevenue = asyncHandler(async (req, res) => {
+
   const year = new Date().getFullYear();
 
-  const data = await Order.aggregate([
+  const revenue = await Order.aggregate([
     {
       $match: {
         orderStatus: "delivered",
         paymentStatus: "paid",
         createdAt: {
           $gte: new Date(`${year}-01-01`),
-          $lte: new Date(`${year + 1}-01-01`),
+          $lt: new Date(`${year + 1}-01-01`),
         },
       },
     },
     {
       $group: {
-        _id: {
-          month: { $month: "$createdAt" },
-        },
+        _id: { month: { $month: "$createdAt" } },
         revenue: { $sum: "$totalAmount" },
       },
     },
@@ -310,7 +309,19 @@ const getMonthlyRevenue = asyncHandler(async (req, res) => {
     { $sort: { month: 1 } },
   ]);
 
-  return res.status(200).json(new ApiResponse(200, "data fetched", true, data));
+  
+  const months = Array.from({ length: 12 }, (_, i) => ({
+    month: i + 1,
+    revenue: 0,
+  }));
+
+  revenue.forEach((item) => {
+    months[item.month - 1].revenue = item.revenue;
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "data fetched", true, months));
 });
 
 const dashboardData = asyncHandler(async (req, res) => {
@@ -367,18 +378,22 @@ const toggleProduct = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Product updated", true, product));
 });
 
-const deleteProduct = asyncHandler(async (req, res) => {
-  const { productId } = req.params;
+const deleteVariant = asyncHandler(async (req, res) => {
+  const { variantId } = req.params;
 
-  const product = await Product.findByIdAndDelete(productId);
+  if (!mongoose.Types.ObjectId.isValid(variantId)) {
+    throw new ApiError(400, "Invalid variant id");
+  }
 
-  if (!product) {
-    throw new ApiError(404, "Product not found");
+  const variant = await Variant.findByIdAndDelete(variantId);
+
+  if (!variant) {
+    throw new ApiError(404, "Variant not found");
   }
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "Product deleted", true, product));
+    .json(new ApiResponse(200, "Variant deleted successfully", true, variant));
 });
 
 const orderDetail = asyncHandler(async (req, res) => {
@@ -447,6 +462,32 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Order status updated", true, order));
 });
 
+const updatePaymentStatus = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
+    throw new ApiError(401, "Invalid orderId");
+  }
+
+  const { paymentStatus } = req.body;
+
+  const order = await Order.findByIdAndUpdate(
+    orderId,
+    { paymentStatus },
+    { new: true }
+  ).select("paymentStatus orderNumber totalAmount");
+
+  if (!order) {
+    throw new ApiError(404, "No order found");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, "Payment status updated successfully", true, order)
+    );
+});
+
 const customers = asyncHandler(async (req, res) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 15;
@@ -505,8 +546,9 @@ export {
   getMonthlyRevenue,
   dashboardData,
   toggleProduct,
-  deleteProduct,
+  deleteVariant,
   orderDetail,
   updateOrderStatus,
   customers,
+  updatePaymentStatus
 };

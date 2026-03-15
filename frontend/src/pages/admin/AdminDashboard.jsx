@@ -24,7 +24,7 @@ const AdminDashboard = () => {
   const monthlyRevenue = async() =>{
     try {
       const res = await API.get("/admin/monthly-rev");
-      console.log(res.data?.data);
+      console.log("error", res.data?.data);
       setRevenueData(res.data.data);
       
     } catch (error) {
@@ -36,7 +36,7 @@ const AdminDashboard = () => {
   const dashboardStats = async() =>{
     try {
       const res = await API.get("/admin/recent-orders");
-      console.log(res.data.data);
+      
       setData(res.data.data);
       setOrders(res.data.data.recentOrders);
       

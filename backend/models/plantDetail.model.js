@@ -14,17 +14,16 @@ const plantSchema = new mongoose.Schema({
     water:{
         type: String,
         required: true,
-        enum:["Light", "Medium", "Heavy"]
+        
     },
     light:{
         type: String,
         required: true,
-        enum: ["Low Light", "Bright Sun", "Full Sun"]
+        
     },
     carelevel:{
         type:String,
         required: true,
-        enum:["Easy Care", "Medium Care", "Difficult Care"]
     },
     potIncluded:{
         type: Boolean,

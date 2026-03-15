@@ -27,6 +27,7 @@ const Orders = () => {
           page
         }
       });
+    console.log(res.data);
       setOrders(res.data.data.docs);
       setTotalPages(res.data.data.totalPages);
     } catch (error) {

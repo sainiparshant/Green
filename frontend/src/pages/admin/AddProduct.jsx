@@ -1,28 +1,30 @@
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { Link, redirect, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API from "../../api/axios";
-import { useRef } from "react";
 
 const AddProduct = () => {
+  const navigate = useNavigate();
+
   const [product, setProduct] = useState({
     name: "",
-    price: "",
-    description: "",
-    stock: "",
-    size: "",
     title: "",
+    description: "",
     productType: "",
   });
 
+  const [variants, setVariants] = useState([
+    { size: "", price: "", stock: "", color: "", height: "", width: "", diameter: "" }
+  ]);
+
   const [images, setImages] = useState([]);
+
   const [plantDetails, setPlantDetails] = useState({
     category: "",
     water: "",
     light: "",
     carelevel: "",
     height: "",
-    potIncluded: "",
   });
 
   const [potDetails, setPotDetails] = useState({
@@ -35,192 +37,248 @@ const AddProduct = () => {
     weight: "",
   });
 
-  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  const validate = () => {
-  const err = {};
-
-    if (!product.name) err.name = "Product name is required";
-    if (!product.title) err.title = "Title is required";
-    if (!product.price) err.price = "Price is required";
-    if (!product.stock) err.stock = "Stock is required";
-    if (!product.productType) err.productType = "Select product type";
-
-    if (product.productType === "Plant") {
-      if (!plantDetails.category) err.category = "Category is required";
-      if (!plantDetails.water) err.water = "Water requirement is required";
-    }
-
-    if (product.productType === "Pot") {
-      if (!potDetails.material) err.material = "Material is required";
-    }
-
-    setErrors(err);
-    return Object.keys(err).length === 0;
+  const addVariant = () => {
+    setVariants([
+      ...variants,
+      { size: "", price: "", stock: "", color: "", height: "", width: "", diameter: "" },
+    ]);
   };
 
+  const removeVariant = (index) => {
+    const updated = [...variants];
+    updated.splice(index, 1);
+    setVariants(updated);
+  };
 
-  const submitHandler = async(e) => {
+  const updateVariant = (index, key, value) => {
+    const updated = [...variants];
+    updated[index][key] = value;
+    setVariants(updated);
+  };
+
+  const submitHandler = async (e) => {
     e.preventDefault();
-    if(!validate()) return;
-    setLoading(true);
 
     const formData = new FormData();
 
-    Object.entries(product).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
+    formData.append("name", product.name);
+    formData.append("title", product.title);
+    formData.append("description", product.description);
+    formData.append("productType", product.productType);
 
-    images.forEach((image) => {
-      formData.append("images", image);
-    });
+    formData.append("variants", JSON.stringify(variants));
 
-    if(product.productType === "Plant") {
+    if (product.productType === "Plant") {
       formData.append("details", JSON.stringify(plantDetails));
     }
 
-    if(product.productType === "Pot") {
+    if (product.productType === "Pot") {
       formData.append("details", JSON.stringify(potDetails));
     }
 
-    
+    images.forEach((img) => {
+      formData.append("images", img);
+    });
+
     try {
-      const { data } = await API.post("/admin/add-product", formData, {
+      setLoading(true);
+
+      await API.post("/admin/add-product", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       alert("Product added successfully");
       navigate("/admin/products");
-    } catch (error) {
-      console.log(error);
-    } finally{
+    } catch (err) {
+      console.log(err);
+      alert("Failed to add product");
+    } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 pb-24">
-      <div className="mb-6">
+    <div className="min-h-screen bg-gray-50 p-6">
+
+      {/* Header */}
+
+      <div className="max-w-5xl mx-auto mb-6">
         <Link
           to="/admin/products"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+          className="flex items-center gap-2 text-gray-600 hover:text-black"
         >
-          <ArrowLeft size={16} />
-          Back to Products
+          <ArrowLeft size={18} /> Back
         </Link>
 
-        <h1 className="text-2xl font-semibold text-gray-900 mt-2">
-          Add New Product
-        </h1>
-        <p className="text-sm text-gray-500">
-          Fill in the details below to add a new product.
+        <h1 className="text-2xl font-bold mt-3">Add Product</h1>
+        <p className="text-gray-500 text-sm">
+          Fill the details to add a new product
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 max-w-5xl mx-auto">
-        <form className="space-y-8" onSubmit={submitHandler} >
+      {/* Form */}
+
+      <div className="bg-white border rounded-xl p-6 max-w-5xl mx-auto">
+
+        <form onSubmit={submitHandler} className="space-y-8">
+
+          {/* Basic Info */}
+
           <Section title="Basic Information">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Grid>
               <Input
-                placeholder="Product name"
+                placeholder="Product Name"
                 value={product.name}
-                 error={errors.name}
                 onChange={(e) =>
                   setProduct({ ...product, name: e.target.value })
                 }
               />
+
               <Input
                 placeholder="Title"
                 value={product.title}
-                error={errors.title}
                 onChange={(e) =>
                   setProduct({ ...product, title: e.target.value })
                 }
               />
-              <Input
-                type="number"
-                placeholder="Price"
-                value={product.price}
-                error={errors.price}
-                onChange={(e) =>
-                  setProduct({ ...product, price: e.target.value })
-                }
-              />
-              <Input
-                type="number"
-                placeholder="Stock"
-                value={product.stock}
-                error={errors.stock}
-                onChange={(e) =>
-                  setProduct({ ...product, stock: e.target.value })
-                }
-              />
-            </div>
-          </Section>
+            </Grid>
 
-          <Section title="Product Type">
-            <div className="grid grid-cols-2 md:grid-cols-2 gap-4 ">
-              <select
-                value={product.productType}
-                error={errors.productType}
-                onChange={(e) =>
-                  setProduct({ ...product, productType: e.target.value })
-                }
-                className="input"
-              >
-                <option value="">Select product type</option>
-                <option value="Plant">Plant</option>
-                <option value="Pot">Pot</option>
-              </select>
-
-              <select
-                className="input"
-                value={product.size}
-                onChange={(e) =>
-                  setProduct({ ...product, size: e.target.value })
-                }
-              >
-                <option value="">Select Size</option>
-                <option value="small">small</option>
-                <option value="medium">medium</option>
-                <option value="large">large</option>
-              </select>
-            </div>
-          </Section>
-
-          <Section title="Description">
             <textarea
-              rows={4}
-              placeholder="Product description"
               className="input"
+              rows={4}
+              placeholder="Description"
               value={product.description}
-              error={errors.description}
               onChange={(e) =>
                 setProduct({ ...product, description: e.target.value })
               }
             />
           </Section>
 
-          <Section title="Images">
+          {/* Product Type */}
+
+          <Section title="Product Type">
+            <select
+              className="input"
+              value={product.productType}
+              onChange={(e) =>
+                setProduct({ ...product, productType: e.target.value })
+              }
+            >
+              <option value="">Select Type</option>
+              <option value="Plant">Plant</option>
+              <option value="Pot">Pot</option>
+            </select>
+          </Section>
+
+          {/* Variants */}
+
+          <Section title="Variants">
+            {variants.map((variant, index) => (
+              <div key={index} className="border p-4 rounded-lg mb-4">
+                <Grid>
+
+                  <Input
+                    placeholder="Size"
+                    value={variant.size}
+                    onChange={(e) =>
+                      updateVariant(index, "size", e.target.value)
+                    }
+                  />
+
+                  <Input
+                    type="number"
+                    placeholder="Price"
+                    value={variant.price}
+                    onChange={(e) =>
+                      updateVariant(index, "price", e.target.value)
+                    }
+                  />
+
+                  <Input
+                    type="number"
+                    placeholder="Stock"
+                    value={variant.stock}
+                    onChange={(e) =>
+                      updateVariant(index, "stock", e.target.value)
+                    }
+                  />
+
+                  <Input
+                    placeholder="Color"
+                    value={variant.color}
+                    onChange={(e) =>
+                      updateVariant(index, "color", e.target.value)
+                    }
+                  />
+
+                  <Input
+                    placeholder="Height"
+                    value={variant.height}
+                    onChange={(e) =>
+                      updateVariant(index, "height", e.target.value)
+                    }
+                  />
+
+                  <Input
+                    placeholder="Width"
+                    value={variant.width}
+                    onChange={(e) =>
+                      updateVariant(index, "width", e.target.value)
+                    }
+                  />
+
+                  <Input
+                    placeholder="Diameter"
+                    value={variant.diameter}
+                    onChange={(e) =>
+                      updateVariant(index, "diameter", e.target.value)
+                    }
+                  />
+                </Grid>
+
+                {variants.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeVariant(index)}
+                    className="text-red-500 text-sm mt-2"
+                  >
+                    Remove Variant
+                  </button>
+                )}
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={addVariant}
+              className="bg-gray-200 px-4 py-2 rounded text-sm"
+            >
+              + Add Variant
+            </button>
+          </Section>
+
+          {/* Images */}
+
+          <Section title="Product Images">
             <input
               type="file"
               multiple
               className="input"
               onChange={(e) => setImages([...e.target.files])}
             />
-            <p className="text-xs text-gray-500">
-              Upload one or more product images
-            </p>
           </Section>
+
+          {/* Plant Details */}
 
           {product.productType === "Plant" && (
             <Section title="Plant Details">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Grid>
+
                 <Input
                   placeholder="Category"
                   value={plantDetails.category}
-                  error={errors.category}
                   onChange={(e) =>
                     setPlantDetails({
                       ...plantDetails,
@@ -228,188 +286,131 @@ const AddProduct = () => {
                     })
                   }
                 />
-                <select
-                className="input"
-                value={plantDetails.water}
-                error={errors.water}
-                onChange={(e) =>
-                  setPlantDetails({ ...plantDetails, water: e.target.value })
-                }
-              >
-                <option value="">Water requirement</option>
-                <option value="Light">Light</option>
-                <option value="Medium">Medium</option>
-                <option value="Heavy">Heavy</option>
-              </select>
 
-                <select
-                className="input"
-                value={plantDetails.light}
-                onChange={(e) =>
-                  setPlantDetails({ ...plantDetails, light: e.target.value })
-                }
-              >
-                <option value="">Light requirement</option>
-                <option value="Low Light">Low Light</option>
-                <option value="Bright Sun">Bright Sun</option>
-                <option value="Full Sun">Full Sun</option>
-              </select>
-
-                <select
-                className="input"
-                value={plantDetails.carelevel}
-                onChange={(e) =>
-                  setPlantDetails({ ...plantDetails, carelevel: e.target.value })
-                }
-              >
-                <option value="">Care level</option>
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Difficult">Difficult</option>
-              </select>
-                
                 <Input
-                  placeholder="Height (cm)"
-                  value={plantDetails.height}
-                  onChange={(e) =>
-                    setPlantDetails({ ...plantDetails, height: e.target.value })
-                  }
-                />
-                <select
-                  className="input"
-                  value={plantDetails.potIncluded}
+                  placeholder="Water"
+                  value={plantDetails.water}
                   onChange={(e) =>
                     setPlantDetails({
                       ...plantDetails,
-                      potIncluded: e.target.value,
+                      water: e.target.value,
                     })
                   }
-                >
-                  <option>Pot included?</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
+                />
+
+                <Input
+                  placeholder="Light"
+                  value={plantDetails.light}
+                  onChange={(e) =>
+                    setPlantDetails({
+                      ...plantDetails,
+                      light: e.target.value,
+                    })
+                  }
+                />
+
+                <Input
+                  placeholder="Care Level"
+                  value={plantDetails.carelevel}
+                  onChange={(e) =>
+                    setPlantDetails({
+                      ...plantDetails,
+                      carelevel: e.target.value,
+                    })
+                  }
+                />
+
+              </Grid>
             </Section>
           )}
 
+          {/* Pot Details */}
+
           {product.productType === "Pot" && (
             <Section title="Pot Details">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  placeholder="Shape"
-                  value={potDetails.shape}
-                  onChange={(e) =>
-                    setPotDetails({ ...potDetails, shape: e.target.value })
-                  }
-                />
+              <Grid>
+
                 <Input
                   placeholder="Material"
                   value={potDetails.material}
                   onChange={(e) =>
-                    setPotDetails({ ...potDetails, material: e.target.value })
+                    setPotDetails({
+                      ...potDetails,
+                      material: e.target.value,
+                    })
                   }
                 />
+
                 <Input
-                  placeholder="Color"
-                  value={potDetails.color}
+                  placeholder="Shape"
+                  value={potDetails.shape}
                   onChange={(e) =>
-                    setPotDetails({ ...potDetails, color: e.target.value })
+                    setPotDetails({
+                      ...potDetails,
+                      shape: e.target.value,
+                    })
                   }
                 />
+
                 <Input
-                  placeholder="Diameter (cm)"
-                  value={potDetails.diameter}
-                  onChange={(e) =>
-                    setPotDetails({ ...potDetails, diameter: e.target.value })
-                  }
-                />
-                <Input
-                  placeholder="Height (cm)"
-                  value={potDetails.height}
-                  onChange={(e) =>
-                    setPotDetails({ ...potDetails, height: e.target.value })
-                  }
-                />
-               <select
-                className="input"
-                value={potDetails.indoorOutdoor}
-                onChange={(e) =>
-                  setPotDetails({ ...potDetails, indoorOutdoor: e.target.value })
-                }
-              >
-                <option value="">Indoor / Outdoor</option>
-                <option value="Indoor">Indoor</option>
-                <option value="Outdoor">Outdoor</option>
-                <option value="Both">Both</option>
-              </select>
-                <Input
-                  placeholder="Weight (kg)"
+                  placeholder="Weight"
                   value={potDetails.weight}
                   onChange={(e) =>
-                    setPotDetails({ ...potDetails, weight: e.target.value })
+                    setPotDetails({
+                      ...potDetails,
+                      weight: e.target.value,
+                    })
                   }
                 />
-              </div>
+
+              </Grid>
             </Section>
           )}
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-end">
+          {/* Submit */}
+
+          <div className="flex justify-end gap-3">
             <Link
               to="/admin/products"
-              className="px-4 py-2 rounded-md border text-sm text-center"
+              className="px-4 py-2 border rounded"
             >
               Cancel
             </Link>
+
             <button
               type="submit"
               disabled={loading}
-              className={`px-6 py-2 rounded-md text-sm font-semibold transition cursor-pointer
-                ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-emerald-700 hover:bg-emerald-600 text-white"
-                }`}
+              className="bg-green-700 text-white px-6 py-2 rounded hover:bg-green-600"
             >
               {loading ? "Saving..." : "Save Product"}
             </button>
-
           </div>
+
         </form>
       </div>
     </div>
   );
 };
 
-const Input = ({
-  type = "text",
-  placeholder,
-  value,
-  onChange,
-  error,
-}) => (
-  <div className="space-y-1">
-    {error && (
-      <p className="text-xs text-red-600 font-medium">{error}</p>
-    )}
-    <input
-      type={type}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      className={`input ${
-        error ? "border-red-500 focus:ring-red-500" : ""
-      }`}
-    />
-  </div>
+const Input = ({ type = "text", placeholder, value, onChange }) => (
+  <input
+    type={type}
+    placeholder={placeholder}
+    value={value}
+    onChange={onChange}
+    className="input"
+  />
 );
-
 
 const Section = ({ title, children }) => (
   <div className="space-y-3">
-    <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
+    <h2 className="text-lg font-semibold">{title}</h2>
     {children}
   </div>
+);
+
+const Grid = ({ children }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
 );
 
 export default AddProduct;

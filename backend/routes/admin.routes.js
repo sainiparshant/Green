@@ -7,13 +7,14 @@ import {
   changePassword,
   customers,
   dashboardData,
-  deleteProduct,
+  deleteVariant,
   getMonthlyRevenue,
   getOrders,
   getProducts,
   orderDetail,
   toggleProduct,
   updateOrderStatus,
+  updatePaymentStatus,
 } from "../controllers/admin.controller.js";
 
 const router = Router();
@@ -30,9 +31,10 @@ router.get("/orders", adminAuth, getOrders);
 router.get("/monthly-rev", adminAuth, getMonthlyRevenue);
 router.get("/recent-orders", adminAuth, dashboardData);
 router.patch("/toggle/:productId", adminAuth, toggleProduct);
-router.delete("/delete/:productId", adminAuth, deleteProduct);
+router.delete("/delete/:variantId", adminAuth, deleteVariant);
 router.get("/order/:orderId",adminAuth, orderDetail);
 router.patch("/order/status/:orderId", adminAuth, updateOrderStatus);
+router.patch("/order/payment-status/:orderId", adminAuth, updatePaymentStatus);
 router.get("/customers", adminAuth, customers);
 
 

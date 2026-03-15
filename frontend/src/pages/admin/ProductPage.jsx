@@ -4,6 +4,7 @@ import { useState } from "react";
 import API from "../../api/axios";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const ProductPage = () => {
   const [products, setProducts] = useState([]);
@@ -35,20 +36,25 @@ const ProductPage = () => {
     }
   };
 
-  const deleteProduct = async(id) => {
+  const deleteVariant = async (variantId) => {
+  try {
 
-    setProducts((prev) => prev.filter((p) => p._id !== id));
-    try {
-      await API.delete(`/admin/delete/${id}`);
-      toast.success("product deleted successfully");
-      
-    } catch (error) {
-      console.log(error);
+    await API.delete(`/admin/variant/${variantId}`);
 
-      allProducts();
-      
-    }
+    setProducts((prev) =>
+      prev.map((product) => ({
+        ...product,
+        variants: product.variants.filter((v) => v._id !== variantId),
+      }))
+    );
+
+    toast.success("Variant deleted successfully");
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Failed to delete variant");
   }
+};
 
   useEffect(() => {
     allProducts();
@@ -66,9 +72,11 @@ const ProductPage = () => {
           </p>
         </div>
 
+        <Link to="/admin/products/new" className="w-full sm:w-auto">
         <button className="bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-emerald-600 transition w-full sm:w-auto">
           + Add Product
         </button>
+        </Link>
       </div>
 
       <div className="mt-6 flex flex-col lg:flex-row gap-4 overflow-hidden">
@@ -124,7 +132,7 @@ const ProductPage = () => {
 
       <div className="bg-white rounded-lg border border-gray-300 overflow-hidden mt-6">
         <div className="overflow-x-auto">
-          <ProductTable products={products} onDelete={deleteProduct}/>
+          <ProductTable products={products} deleteVariant={deleteVariant}/>
         </div>
       </div>
 

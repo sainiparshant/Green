@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const AdminProductTable = ({ products }) => {
+const AdminProductTable = ({ products , deleteVariant}) => {
   const [openProduct, setOpenProduct] = useState(null);
 
   return (
@@ -126,7 +126,7 @@ const AdminProductTable = ({ products }) => {
                                 <button className="text-sm text-blue-600 hover:underline mr-3">
                                   Edit
                                 </button>
-                                <button className="text-sm text-red-600 hover:underline">
+                                <button onClick={() => deleteVariant(variant._id)} className="text-sm text-red-600 hover:underline">
                                   Delete
                                 </button>
                               </td>
