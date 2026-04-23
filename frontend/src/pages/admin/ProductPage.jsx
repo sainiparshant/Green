@@ -28,7 +28,6 @@ const ProductPage = () => {
           }
         }
       );
-      console.log(data.data);
       setProducts(data.data.docs);
       setTotalPages(data.data.totalPages);
     } catch (error) {
@@ -39,16 +38,10 @@ const ProductPage = () => {
   const deleteVariant = async (variantId) => {
   try {
 
-    await API.delete(`/admin/variant/${variantId}`);
-
-    setProducts((prev) =>
-      prev.map((product) => ({
-        ...product,
-        variants: product.variants.filter((v) => v._id !== variantId),
-      }))
-    );
+    await API.delete(`/admin/delete/${variantId}`);
 
     toast.success("Variant deleted successfully");
+    allProducts();
 
   } catch (error) {
     console.log(error);

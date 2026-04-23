@@ -90,6 +90,7 @@ const addProduct = asyncHandler(async (req, res) => {
 
   if (!req.files || !req.files.images || req.files.images.length === 0) {
     throw new ApiError(400, "Images are required");
+
   }
 
   const uploadResults = await uploadImages(req.files.images);

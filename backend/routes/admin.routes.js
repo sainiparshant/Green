@@ -16,6 +16,7 @@ import {
   updateOrderStatus,
   updatePaymentStatus,
 } from "../controllers/admin.controller.js";
+import { authorize } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
@@ -24,18 +25,18 @@ router.post(
   upload.fields([{ name: "images", maxCount: 10 }]),
   addProduct
 );
-router.patch("/change-password", adminAuth, changePassword);
-router.post("/add-photo", adminAuth, upload.single("image"), addPhoto);
-router.get("/products",adminAuth, getProducts);
-router.get("/orders", adminAuth, getOrders);
-router.get("/monthly-rev", adminAuth, getMonthlyRevenue);
-router.get("/recent-orders", adminAuth, dashboardData);
-router.patch("/toggle/:productId", adminAuth, toggleProduct);
-router.delete("/delete/:variantId", adminAuth, deleteVariant);
-router.get("/order/:orderId",adminAuth, orderDetail);
-router.patch("/order/status/:orderId", adminAuth, updateOrderStatus);
-router.patch("/order/payment-status/:orderId", adminAuth, updatePaymentStatus);
-router.get("/customers", adminAuth, customers);
+router.patch("/change-password", adminAuth, authorize("admin"), changePassword);
+router.post("/add-photo", adminAuth, authorize("admin"),upload.single("image"), addPhoto);
+router.get("/products",adminAuth,authorize("admin"), getProducts);
+router.get("/orders", adminAuth, authorize("admin"), getOrders);
+router.get("/monthly-rev", adminAuth, authorize("admin"), getMonthlyRevenue);
+router.get("/recent-orders", adminAuth, authorize("admin"), dashboardData);
+router.patch("/toggle/:productId", adminAuth, authorize("admin"), toggleProduct);
+router.delete("/delete/:variantId", adminAuth, authorize("admin"), deleteVariant);
+router.get("/order/:orderId",adminAuth, authorize("admin"), orderDetail);
+router.patch("/order/status/:orderId", adminAuth, authorize("admin"), updateOrderStatus);
+router.patch("/order/payment-status/:orderId", adminAuth, authorize("admin"), updatePaymentStatus);
+router.get("/customers", adminAuth, authorize("admin"), customers);
 
 
 

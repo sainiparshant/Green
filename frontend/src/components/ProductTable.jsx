@@ -30,11 +30,7 @@ const AdminProductTable = ({ products , deleteVariant}) => {
                 <tr
                   key={product._id}
                   className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() =>
-                    setOpenProduct(
-                      openProduct === product._id ? null : product._id
-                    )
-                  }
+                  
                 >
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {product.name}
@@ -68,7 +64,11 @@ const AdminProductTable = ({ products , deleteVariant}) => {
                     {totalStock}
                   </td>
 
-                  <td className="px-4 py-3 text-emerald-600 text-sm">
+                  <td className="px-4 py-3 text-emerald-600 text-sm" onClick={() =>
+                    setOpenProduct(
+                      openProduct === product._id ? null : product._id
+                    )
+                  }>
                     {openProduct === product._id ? "Hide" : "View"}
                   </td>
                 </tr>

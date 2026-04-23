@@ -22,9 +22,9 @@ const adminAuth = asyncHandler( async(req,res,next) => {
         throw new ApiError(404, "User not found");
     }
 
-    if (user.role !== "admin") {
-    throw new ApiError(403, "Access denied: Admin only");
-    }
+    // if (user.role !== "admin") {
+    // throw new ApiError(403, "Access denied: Admin only");
+    // }
 
     req.user = user;
     next();

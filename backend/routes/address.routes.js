@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyJwt } from "../middleware/auth.middleware.js";
+import { authorize, verifyJwt } from "../middleware/auth.middleware.js";
 import {
   addAddress,
   deleteAddress,
@@ -10,10 +10,10 @@ import {
 
 const router = Router();
 
-router.post("/add-addr", verifyJwt, addAddress);
-router.get("/get-addrs", verifyJwt, getAddress);
-router.delete("/remove-addr/:id", verifyJwt, deleteAddress);
-router.patch("/update-addr/:id", verifyJwt, updateAddress);
-router.patch("/update-default/:id", verifyJwt, setDefaultAddress);
+router.post("/add-addr", verifyJwt, authorize("user", "admin"), addAddress);
+router.get("/get-addrs", verifyJwt, authorize("user", "admin"), getAddress);
+router.delete("/remove-addr/:id",authorize("user", "admin"),  verifyJwt, deleteAddress);
+router.patch("/update-addr/:id", verifyJwt, authorize("user", "admin"), updateAddress);
+router.patch("/update-default/:id", verifyJwt, authorize("user", "admin"), setDefaultAddress);
 
 export default router;
