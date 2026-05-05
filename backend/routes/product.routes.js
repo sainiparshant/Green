@@ -6,17 +6,17 @@ import { authorize } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-router.get("/search", authorize("user", "admin"), globalSearch);
+router.get("/search",  globalSearch);
 
 // plant
-router.get("/all/plants", authorize("user", "admin"), getAllPlants);
-router.get("/single-plant/:id", authorize("user", "admin"), getSinglePlant);
+router.get("/all/plants", getAllPlants);
+router.get("/single-plant/:id", getSinglePlant);
 
 
 // pots
 
-router.get("/all/pots", authorize("user", "admin"), getAllPots);
-router.get("/single-pot/:id", authorize("user", "admin"), getSinglePot);
+router.get("/all/pots", getAllPots);
+router.get("/single-pot/:id", getSinglePot);
 
 
 
