@@ -22,6 +22,8 @@ const router = Router();
 
 router.post(
   "/add-product",
+  adminAuth,
+  authorize("admin"),
   upload.fields([{ name: "images", maxCount: 10 }]),
   addProduct
 );
