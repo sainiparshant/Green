@@ -5,7 +5,6 @@ import connectDb from "./db/connectDb.js";
 import authRoutes from './routes/auth.routes.js'
 import cookieParser from "cookie-parser";
 import adminRoutes from "./routes/admin.routes.js"
-import adminCreate from "./scripts/adminCreate.js";
 import productRoutes from "./routes/product.routes.js"
 import cartRoutes from "./routes/cart.routes.js"
 import addressRoutes from "./routes/address.routes.js"
@@ -22,7 +21,6 @@ const app = express();
 const port = process.env.PORT || 5000;
 connectDb();
 
-adminCreate();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
