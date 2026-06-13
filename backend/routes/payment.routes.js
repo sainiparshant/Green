@@ -4,7 +4,7 @@ import { createOrder, verifyPayment } from "../controllers/payment.controller.js
 
 const router = Router();
 
-router.post("/create-order", authorize("user", "admin"), verifyJwt, createOrder);
-router.post("/verify-order", authorize("user", "admin"), verifyJwt, verifyPayment);
+router.post("/create-order",verifyJwt, authorize("user", "admin"), createOrder);
+router.post("/verify-order",verifyJwt, authorize("user", "admin"), verifyPayment);
 
 export default router;

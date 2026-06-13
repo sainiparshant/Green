@@ -6,8 +6,8 @@ import upload from "../middleware/multer.middleware.js";
 
 const router = Router();
 
-router.patch("/update-profile",authorize("user", "admin"), verifyJwt, updateProfileInfo);
+router.patch("/update-profile", verifyJwt,authorize("user", "admin"), updateProfileInfo);
 router.post("/upload-photo", upload.single("photo"), verifyJwt, addProfileImage);
-router.delete("/delete-photo", authorize("user", "admin"), verifyJwt, deleteProfileImage);
+router.delete("/delete-photo",verifyJwt, authorize("user", "admin"), deleteProfileImage);
 
 export default router;

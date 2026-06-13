@@ -22,6 +22,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 connectDb();
 
+adminCreate();
+
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
